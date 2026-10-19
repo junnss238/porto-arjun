@@ -16,7 +16,6 @@
     -webkit-font-smoothing: antialiased; overflow-x: hidden;
   }
   #root { width: 100%; }
-
   .grid-bg {
     position: absolute; inset: 0; z-index: 0;
     background-image:
@@ -27,8 +26,7 @@
     -webkit-mask-image: radial-gradient(ellipse 70% 50% at 50% 50%, black 10%, transparent 100%);
     opacity: 0.4;
   }
-
-  .hero-glow {
+  .hero-glow-bg {
     position: absolute; top: 38%; left: 50%;
     transform: translate(-50%, -50%);
     width: 700px; height: 350px;
@@ -36,18 +34,26 @@
     pointer-events: none; z-index: 0;
   }
 </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18?bundle",
+    "react-dom/client": "https://esm.sh/react-dom@18/client?bundle",
+    "framer-motion": "https://esm.sh/framer-motion@11?bundle",
+    "htm": "https://esm.sh/htm@3?bundle"
+  }
+}
+</script>
 </head>
 <body>
 <div id="root"></div>
+<script type="module">
+import React, { useState, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import htm from 'htm';
 
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/framer-motion@11/dist/framer-motion.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-<script type="text/babel">
-const { useState, useEffect, useRef } = React;
-const { motion, useInView, AnimatePresence, useScroll, useTransform, useSpring } = window["framer-motion"] || FramerMotion;
+const html = htm.bind(React.createElement);
 
 /* ── DATA ── */
 const STACK = ["Python","Next.js","TypeScript","Linux VPS","Telegram API","Moodle API","CalDAV","Framer Motion","shadcn/ui","FastAPI","Multi-Agent","Cron","REST API","Git","Obsidian"];
@@ -57,92 +63,90 @@ const PROJECTS = [
   { name:"Job Radar Engine", desc:"Scraper lowongan magang otomatis. Silent kalau kosong, digest ke Telegram kalau ada yang relevan.", tags:["Python","Scraping","NLP"], live:true },
   { name:"Unified Calendar Engine", desc:"Apple iCloud CalDAV dynamic discovery. Sync Google Calendar + iCal. Morning briefing contextual real-time.", tags:["Python","CalDAV","iCloud"], live:true },
 ];
-const SKILLS = [
+const SKILLS_DATA = [
   { cat:"AI & Agent", items:["Multi-Agent Architecture","Prompt Engineering","Moodle API","Telegram Bot API"] },
   { cat:"Backend", items:["Python","FastAPI","REST APIs","Cron / Linux"] },
   { cat:"Frontend", items:["Next.js","TypeScript","Tailwind CSS","Framer Motion"] },
   { cat:"Tools", items:["Git / GitHub","Obsidian","Hermes Agent","CalDAV / iCal"] },
 ];
 
-/* ── FadeInView component ── */
-function FadeIn({ children, delay = 0, y = 32, className = "", once = true }) {
+const ease = [0.22, 1, 0.36, 1];
+const spring = { type: "spring", stiffness: 400, damping: 25 };
+
+/* ── FadeIn ── */
+function FadeIn({ children, delay = 0, y = 32 }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once, margin: "-60px" });
-  return (
-    <motion.div ref={ref} className={className}
-      initial={{ opacity: 0, y }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}>
-      {children}
-    </motion.div>
-  );
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  return html\`<\${motion.div} ref=\${ref}
+    initial=\${{ opacity: 0, y }}
+    animate=\${inView ? { opacity: 1, y: 0 } : {}}
+    transition=\${{ duration: 0.6, delay, ease }}>\${children}</\${motion.div}>\`;
 }
 
-/* ── Card component ── */
+/* ── Card ── */
 function Card({ project, i }) {
   const [hover, setHover] = useState(false);
-  return (
-    <FadeIn delay={i * 0.1}>
-      <motion.div
-        style={{
-          background:"#08090c", border:"1px solid #13151b",
-          borderRadius:14, padding:"26px 26px 22px",
-          position:"relative", overflow:"hidden",
-        }}
-        whileHover={{ y: -4, borderColor: "#252833", background: "#0e0f14" }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
-        <motion.div style={{
+  return html\`
+    <\${FadeIn} delay=\${i * 0.1}>
+      <\${motion.div} style=${{
+        background:"#08090c", border:"1px solid #13151b",
+        borderRadius:14, padding:"26px 26px 22px",
+        position:"relative", overflow:"hidden"
+      }}
+        whileHover=${{ y: -4, borderColor: "#252833", background: "#0e0f14" }}
+        transition=${{ type: "spring", stiffness: 300, damping: 25 }}
+        onMouseEnter=\${()=>setHover(true)} onMouseLeave=\${()=>setHover(false)}>
+
+        <\${motion.div} style=${{
           position:"absolute", top:-80, right:-80, width:200, height:200,
           borderRadius:"50%",
           background:"radial-gradient(circle, rgba(94,106,210,0.12) 0%, transparent 70%)",
           pointerEvents:"none"
-        }} animate={{ opacity: hover ? 1 : 0 }} transition={{ duration: 0.3 }} />
+        }} animate=${{ opacity: hover ? 1 : 0 }} transition=${{ duration: 0.3 }} />
 
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 }}>
-          <span style={{ fontSize:14, fontWeight:600, color:"#dde0ea", letterSpacing:"-0.01em" }}>{project.name}</span>
-          {project.live && (
-            <div style={{ display:"flex", alignItems:"center", gap:5, marginLeft:8, flexShrink:0 }}>
-              <motion.span
-                style={{ width:5, height:5, borderRadius:"50%", background:"#27a644", display:"block" }}
-                animate={{ scale:[1,1.5,1], opacity:[1,0.5,1] }}
-                transition={{ duration:2, repeat:Infinity }} />
-              <span style={{ fontSize:11, color:"#27a644", fontWeight:500 }}>live</span>
+        <div style=${{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 }}>
+          <span style=${{ fontSize:14, fontWeight:600, color:"#dde0ea", letterSpacing:"-0.01em" }}>\${project.name}</span>
+          \${project.live && html\`
+            <div style=${{ display:"flex", alignItems:"center", gap:5, marginLeft:8, flexShrink:0 }}>
+              <\${motion.span} style=${{ width:5, height:5, borderRadius:"50%", background:"#27a644", display:"block" }}
+                animate=${{ scale:[1,1.5,1], opacity:[1,0.5,1] }}
+                transition=${{ duration:2, repeat:Infinity }} />
+              <span style=${{ fontSize:11, color:"#27a644", fontWeight:500 }}>live</span>
             </div>
-          )}
+          \`}
         </div>
-        <p style={{ fontSize:13, color:"#484c5e", lineHeight:1.65, marginBottom:16 }}>{project.desc}</p>
-        <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
-          {project.tags.map(t=>(
-            <span key={t} style={{
+        <p style=${{ fontSize:13, color:"#484c5e", lineHeight:1.65, marginBottom:16 }}>\${project.desc}</p>
+        <div style=${{ display:"flex", gap:5, flexWrap:"wrap" }}>
+          \${project.tags.map(t => html\`
+            <span key=\${t} style=${{
               fontSize:11, color:"#32353f", background:"#0d0e12",
               border:"1px solid #16181f", borderRadius:5, padding:"2px 8px"
-            }}>{t}</span>
-          ))}
+            }}>\${t}</span>
+          \`)}
         </div>
-      </motion.div>
-    </FadeIn>
-  );
+      </\${motion.div}>
+    </\${FadeIn}>
+  \`;
 }
 
 /* ── Marquee ── */
 function Marquee({ items, reverse = false }) {
-  const doubled = [...items, ...items, ...items, ...items];
-  return (
-    <div style={{ overflow:"hidden" }}>
-      <motion.div style={{ display:"flex", gap:10, width:"max-content" }}
-        animate={{ x: reverse ? ["0%", "25%"] : ["0%", "-25%"] }}
-        transition={{ duration: 28, repeat: Infinity, ease: "linear" }}>
-        {doubled.map((s,i)=>(
-          <span key={i} style={{
+  const q = [...items, ...items, ...items, ...items];
+  return html\`
+    <div style=${{ overflow:"hidden" }}>
+      <\${motion.div} style=${{ display:"flex", gap:10, width:"max-content" }}
+        animate=${{ x: reverse ? ["0%","25%"] : ["0%","-25%"] }}
+        transition=${{ duration: 28, repeat: Infinity, ease: "linear" }}>
+        \${q.map((s,i) => html\`
+          <span key=\${i} style=${{
             fontSize:12, fontWeight:500, color:"#3a3d45",
             padding:"5px 14px", border:"1px solid #16181f",
             borderRadius:9999, background:"#0a0b0e", whiteSpace:"nowrap"
-          }}>{s}</span>
-        ))}
-      </motion.div>
+          }}>\${s}</span>
+        \`)}
+      </\${motion.div}>
     </div>
-  );
+  \`;
 }
 
 /* ── App ── */
@@ -151,185 +155,182 @@ function App() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const glowY = useTransform(scrollYProgress, [0, 1], [0, -120]);
 
-  return (
-    <>
-      {/* NAV */}
-      <motion.nav style={{
+  return html\`
+    <\${React.Fragment}>
+      <!-- NAV -->
+      <\${motion.nav} style=${{
         position:"fixed", top:16, left:"50%", transform:"translateX(-50%)", zIndex:100,
         display:"flex", alignItems:"center", gap:28,
         background:"rgba(8,9,12,0.8)", backdropFilter:"blur(20px)",
         border:"1px solid #13151b", borderRadius:9999, padding:"10px 24px"
       }}
-        initial={{ y: -30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.22,1,0.36,1] }}>
-        <span style={{ fontSize:14, fontWeight:600, color:"#dde0ea", letterSpacing:"-0.01em" }}>Arjun</span>
-        <div style={{ display:"flex", gap:18 }}>
-          {["Projects","Skills","Contact"].map(s=>(
-            <motion.a key={s} href={`#${s.toLowerCase()}`}
-              style={{ fontSize:13, color:"#484c5e", textDecoration:"none" }}
-              whileHover={{ color:"#dde0ea" }}>{s}</motion.a>
-          ))}
+        initial=${{ y: -30, opacity: 0 }}
+        animate=${{ y: 0, opacity: 1 }}
+        transition=${{ duration: 0.6, ease }}>
+        <span style=${{ fontSize:14, fontWeight:600, color:"#dde0ea", letterSpacing:"-0.01em" }}>Arjun</span>
+        <div style=${{ display:"flex", gap:18 }}>
+          \${["Projects","Skills","Contact"].map(s => html\`
+            <\${motion.a} key=\${s} href=\${"\#"+s.toLowerCase()}
+              style=${{ fontSize:13, color:"#484c5e", textDecoration:"none" }}
+              whileHover=${{ color:"#dde0ea" }}>\${s}</\${motion.a}>
+          \`)}
         </div>
-      </motion.nav>
+      </\${motion.nav}>
 
-      {/* HERO */}
-      <section ref={heroRef} style={{
+      <!-- HERO -->
+      <section ref=\${heroRef} style=${{
         minHeight:"100vh", display:"flex", flexDirection:"column",
         justifyContent:"center", alignItems:"center", textAlign:"center",
         padding:"0 24px", position:"relative", overflow:"hidden"
       }}>
-        <div className="grid-bg" />
-        <motion.div className="hero-glow" style={{ y: glowY }} />
-        <div style={{ position:"relative", zIndex:1, display:"flex", flexDirection:"column", alignItems:"center" }}>
-          <motion.div style={{
+        <div class="grid-bg" />
+        <\${motion.div} class="hero-glow-bg" style=${{ y: glowY }} />
+        <div style=${{ position:"relative", zIndex:1, display:"flex", flexDirection:"column", alignItems:"center" }}>
+          <\${motion.div} style=${{
             display:"inline-flex", alignItems:"center", gap:7,
             fontSize:12, fontWeight:500, color:"#7c87f5",
             background:"rgba(94,106,210,0.08)", border:"1px solid rgba(94,106,210,0.2)",
             borderRadius:9999, padding:"5px 14px", marginBottom:36
-          }} initial={{ y:20, opacity:0 }} animate={{ y:0, opacity:1 }} transition={{ delay:0.1, duration:0.5 }}>
-            <motion.span style={{ width:6, height:6, borderRadius:"50%", background:"#27a644", display:"block" }}
-              animate={{ scale:[1,1.5,1], opacity:[1,0.5,1] }}
-              transition={{ duration:2, repeat:Infinity }} />
+          }} initial=${{ y:20, opacity:0 }} animate=${{ y:0, opacity:1 }} transition=${{ delay:0.1, duration:0.5 }}>
+            <\${motion.span} style=${{ width:6, height:6, borderRadius:"50%", background:"#27a644", display:"block" }}
+              animate=${{ scale:[1,1.5,1], opacity:[1,0.5,1] }}
+              transition=${{ duration:2, repeat:Infinity }} />
             Available for internship · 2025
-          </motion.div>
+          </\${motion.div}>
 
-          <h1 style={{ fontSize:"clamp(40px,8vw,78px)", fontWeight:700, letterSpacing:"-0.04em", lineHeight:1.03, marginBottom:24, maxWidth:760 }}>
-            <span style={{ display:"block", overflow:"hidden" }}>
-              <motion.span style={{ display:"block" }} initial={{ y:"110%" }} animate={{ y:0 }} transition={{ duration:0.8, delay:0.2, ease:[0.22,1,0.36,1] }}>
+          <h1 style=${{ fontSize:"clamp(40px,8vw,78px)", fontWeight:700, letterSpacing:"-0.04em", lineHeight:1.03, marginBottom:24, maxWidth:760 }}>
+            <span style=${{ display:"block", overflow:"hidden" }}>
+              <\${motion.span} style=${{ display:"block" }} initial=${{ y:"110%" }} animate=${{ y:0 }} transition=${{ duration:0.8, delay:0.2, ease }}>
                 Building AI systems
-              </motion.span>
+              </\${motion.span}>
             </span>
-            <span style={{ display:"block", overflow:"hidden" }}>
-              <motion.span style={{
+            <span style=${{ display:"block", overflow:"hidden" }}>
+              <\${motion.span} style=${{
                 display:"block",
                 background:"linear-gradient(130deg, #828fff 0%, #5e6ad2 45%, #a78bfa 100%)",
                 WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
                 backgroundClip:"text"
-              }} initial={{ y:"110%" }} animate={{ y:0 }} transition={{ duration:0.8, delay:0.32, ease:[0.22,1,0.36,1] }}>
+              }} initial=${{ y:"110%" }} animate=${{ y:0 }} transition=${{ duration:0.8, delay:0.32, ease }}>
                 that actually run
-              </motion.span>
+              </\${motion.span}>
             </span>
           </h1>
 
-          <motion.p style={{ fontSize:17, color:"#484c5e", maxWidth:460, lineHeight:1.72, marginBottom:40 }}
-            initial={{ y:24, opacity:0 }} animate={{ y:0, opacity:1 }}
-            transition={{ delay:0.6, duration:0.6, ease:[0.22,1,0.36,1] }}>
-            Double Degree — TI UPNYK &amp; HES STAIQ. Fokus di AI agent architecture,
+          <\${motion.p} style=${{ fontSize:17, color:"#484c5e", maxWidth:460, lineHeight:1.72, marginBottom:40 }}
+            initial=${{ y:24, opacity:0 }} animate=${{ y:0, opacity:1 }}
+            transition=${{ delay:0.6, duration:0.6, ease }}>
+            Double Degree — TI UPNYK & HES STAIQ. Fokus di AI agent architecture,
             backend automation, dan sistem yang jalan sendiri 24/7 di production.
-          </motion.p>
+          </\${motion.p}>
 
-          <motion.div style={{ display:"flex", gap:10 }}
-            initial={{ y:20, opacity:0 }} animate={{ y:0, opacity:1 }}
-            transition={{ delay:0.75, duration:0.5, ease:[0.22,1,0.36,1] }}>
-            <motion.a href="#projects" style={{
+          <\${motion.div} style=${{ display:"flex", gap:10 }}
+            initial=${{ y:20, opacity:0 }} animate=${{ y:0, opacity:1 }}
+            transition=${{ delay:0.75, duration:0.5, ease }}>
+            <\${motion.a} href="#projects" style=${{
               fontSize:14, fontWeight:500, color:"#fff",
               background:"#5e6ad2", border:"1px solid #6b78e0",
               borderRadius:10, padding:"10px 22px", textDecoration:"none"
-            }} whileHover={{ y:-2, background:"#6b78e0" }}
-              whileTap={{ scale:0.97 }}
-              transition={{ type:"spring", stiffness:400, damping:25 }}>
+            }} whileHover=${{ y:-2, background:"#6b78e0" }}
+              whileTap=${{ scale:0.97 }} transition=\${spring}>
               Lihat projects ↓
-            </motion.a>
-            <motion.a href="https://github.com/junnss238" target="_blank" style={{
+            </\${motion.a}>
+            <\${motion.a} href="https://github.com/junnss238" target="_blank" style=${{
               fontSize:14, fontWeight:500, color:"#7a7f94",
               background:"#0d0e12", border:"1px solid #13151b",
               borderRadius:10, padding:"10px 22px", textDecoration:"none"
-            }} whileHover={{ y:-2, borderColor:"#2a2d38", color:"#dde0ea" }}
-              whileTap={{ scale:0.97 }}
-              transition={{ type:"spring", stiffness:400, damping:25 }}>
+            }} whileHover=${{ y:-2, borderColor:"#2a2d38", color:"#dde0ea" }}
+              whileTap=${{ scale:0.97 }} transition=\${spring}>
               GitHub ↗
-            </motion.a>
-          </motion.div>
+            </\${motion.a}>
+          </\${motion.div}>
         </div>
 
-        <motion.div style={{
+        <\${motion.div} style=${{
           position:"absolute", bottom:28, left:"50%", transform:"translateX(-50%)",
           width:20, height:32, border:"1px solid #16181f", borderRadius:10,
           display:"flex", justifyContent:"center", paddingTop:6
-        }} initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.2 }}>
-          <motion.div style={{ width:3, height:6, background:"#2a2d38", borderRadius:2 }}
-            animate={{ y:[0,8,0] }}
-            transition={{ duration:1.7, repeat:Infinity, ease:"easeInOut" }} />
-        </motion.div>
+        }} initial=${{ opacity:0 }} animate=${{ opacity:1 }} transition=${{ delay:1.2 }}>
+          <\${motion.div} style=${{ width:3, height:6, background:"#2a2d38", borderRadius:2 }}
+            animate=${{ y:[0,8,0] }}
+            transition=${{ duration:1.7, repeat:Infinity, ease:"easeInOut" }} />
+        </\${motion.div}>
       </section>
 
-      {/* MARQUEE */}
-      <div style={{ padding:"36px 0", borderTop:"1px solid #0d0e12", borderBottom:"1px solid #0d0e12", display:"flex", flexDirection:"column", gap:10, overflow:"hidden" }}>
-        <Marquee items={STACK} />
-        <Marquee items={STACK} reverse />
+      <!-- MARQUEE -->
+      <div style=${{ padding:"36px 0", borderTop:"1px solid #0d0e12", borderBottom:"1px solid #0d0e12", display:"flex", flexDirection:"column", gap:10, overflow:"hidden" }}>
+        <\${Marquee} items=\${STACK} />
+        <\${Marquee} items=\${STACK} reverse=\${true} />
       </div>
 
-      {/* PROJECTS */}
-      <hr style={{ border:"none", borderTop:"1px solid #0d0e12" }} />
-      <div id="projects-section" style={{ maxWidth:980, margin:"0 auto", padding:"96px 24px" }}>
-        <FadeIn>
-          <p style={{ fontSize:11, fontWeight:600, color:"#5e6ad2", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>Projects</p>
-          <p style={{ fontSize:30, fontWeight:700, letterSpacing:"-0.025em", color:"#dde0ea", marginBottom:52 }}>
+      <!-- PROJECTS -->
+      <hr style=${{ border:"none", borderTop:"1px solid #0d0e12" }} />
+      <div id="projects" style=${{ maxWidth:980, margin:"0 auto", padding:"96px 24px" }}>
+        <\${FadeIn}>
+          <p style=${{ fontSize:11, fontWeight:600, color:"#5e6ad2", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>Projects</p>
+          <p style=${{ fontSize:30, fontWeight:700, letterSpacing:"-0.025em", color:"#dde0ea", marginBottom:52 }}>
             Sistem yang sudah live di production
           </p>
-        </FadeIn>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(440px,1fr))", gap:14 }}>
-          {PROJECTS.map((p,i)=><Card key={p.name} project={p} i={i} />)}
+        </\${FadeIn}>
+        <div style=${{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(440px,1fr))", gap:14 }}>
+          \${PROJECTS.map((p,i) => html\`<\${Card} key=\${p.name} project=\${p} i=\${i} />\`)}
         </div>
       </div>
 
-      {/* SKILLS */}
-      <hr style={{ border:"none", borderTop:"1px solid #0d0e12" }} />
-      <div id="skills" style={{ maxWidth:980, margin:"0 auto", padding:"96px 24px" }}>
-        <FadeIn>
-          <p style={{ fontSize:11, fontWeight:600, color:"#5e6ad2", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>Skills</p>
-          <p style={{ fontSize:30, fontWeight:700, letterSpacing:"-0.025em", color:"#dde0ea", marginBottom:52 }}>Stack &amp; expertise</p>
-        </FadeIn>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(200px,1fr))", gap:36 }}>
-          {SKILLS.map((s,i)=>(
-            <FadeIn key={s.cat} delay={i*0.08}>
-              <div style={{ fontSize:11, fontWeight:600, color:"#5e6ad2", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:14 }}>{s.cat}</div>
-              {s.items.map(item=>(
-                <motion.p key={item} style={{ fontSize:14, color:"#484c5e", marginBottom:10, cursor:"default" }}
-                  whileHover={{ color:"#dde0ea" }}>{item}</motion.p>
-              ))}
-            </FadeIn>
-          ))}
+      <!-- SKILLS -->
+      <hr style=${{ border:"none", borderTop:"1px solid #0d0e12" }} />
+      <div id="skills" style=${{ maxWidth:980, margin:"0 auto", padding:"96px 24px" }}>
+        <\${FadeIn}>
+          <p style=${{ fontSize:11, fontWeight:600, color:"#5e6ad2", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>Skills</p>
+          <p style=${{ fontSize:30, fontWeight:700, letterSpacing:"-0.025em", color:"#dde0ea", marginBottom:52 }}>Stack & expertise</p>
+        </\${FadeIn}>
+        <div style=${{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(200px,1fr))", gap:36 }}>
+          \${SKILLS_DATA.map((s,i) => html\`
+            <\${FadeIn} key=\${s.cat} delay=\${i*0.08}>
+              <div style=${{ fontSize:11, fontWeight:600, color:"#5e6ad2", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:14 }}>\${s.cat}</div>
+              \${s.items.map(item => html\`
+                <\${motion.p} key=\${item} style=${{ fontSize:14, color:"#484c5e", marginBottom:10, cursor:"default" }}
+                  whileHover=${{ color:"#dde0ea" }}>\${item}</\${motion.p}>
+              \`)}
+            </\${FadeIn}>
+          \`)}
         </div>
       </div>
 
-      {/* CONTACT */}
-      <hr style={{ border:"none", borderTop:"1px solid #0d0e12" }} />
-      <div id="contact" style={{ textAlign:"center", padding:"96px 24px 120px" }}>
-        <FadeIn>
-          <p style={{ fontSize:11, fontWeight:600, color:"#5e6ad2", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>Contact</p>
-          <h2 style={{ fontSize:"clamp(28px,5vw,52px)", fontWeight:700, letterSpacing:"-0.03em", color:"#dde0ea", marginBottom:14 }}>Open to opportunities</h2>
-          <p style={{ fontSize:16, color:"#484c5e", maxWidth:380, margin:"0 auto 40px", lineHeight:1.7 }}>
+      <!-- CONTACT -->
+      <hr style=${{ border:"none", borderTop:"1px solid #0d0e12" }} />
+      <div id="contact" style=${{ textAlign:"center", padding:"96px 24px 120px" }}>
+        <\${FadeIn}>
+          <p style=${{ fontSize:11, fontWeight:600, color:"#5e6ad2", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>Contact</p>
+          <h2 style=${{ fontSize:"clamp(28px,5vw,52px)", fontWeight:700, letterSpacing:"-0.03em", color:"#dde0ea", marginBottom:14 }}>Open to opportunities</h2>
+          <p style=${{ fontSize:16, color:"#484c5e", maxWidth:380, margin:"0 auto 40px", lineHeight:1.7 }}>
             Lagi cari magang / project kolaborasi — AI, data, atau backend automation.
           </p>
-          <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
-            {[
+          <div style=${{ display:"flex", gap:10, justifyContent:"center" }}>
+            \${[
               { label:"GitHub ↗", href:"https://github.com/junnss238" },
               { label:"Telegram ↗", href:"https://t.me/juna_ai_bot" }
-            ].map(l=>(
-              <motion.a key={l.label} href={l.href} target="_blank" style={{
+            ].map(l => html\`
+              <\${motion.a} key=\${l.label} href=\${l.href} target="_blank" style=${{
                 fontSize:14, fontWeight:500, color:"#dde0ea",
                 background:"#0d0e12", border:"1px solid #13151b",
                 borderRadius:10, padding:"11px 24px", textDecoration:"none"
-              }} whileHover={{ y:-2, borderColor:"#2a2d38" }}
-                whileTap={{ scale:0.97 }}
-                transition={{ type:"spring", stiffness:400, damping:25 }}>
-                {l.label}
-              </motion.a>
-            ))}
+              }} whileHover=${{ y:-2, borderColor:"#2a2d38" }}
+                whileTap=${{ scale:0.97 }} transition=\${spring}>
+                \${l.label}
+              </\${motion.a}>
+            \`)}
           </div>
-        </FadeIn>
+        </\${FadeIn}>
       </div>
 
-      <footer style={{ borderTop:"1px solid #0d0e12", textAlign:"center", padding:"18px 24px", fontSize:12, color:"#20222b" }}>
+      <footer style=${{ borderTop:"1px solid #0d0e12", textAlign:"center", padding:"18px 24px", fontSize:12, color:"#20222b" }}>
         M Arjun Nabila · 2025
       </footer>
-    </>
-  );
+    </\${React.Fragment}>
+  \`;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+createRoot(document.getElementById('root')).render(html\`<\${App} />\`);
 </script>
 </body>
 </html>
