@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>M Arjun Nabila — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #05060a; color: #dde0ea;
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    overflow-x: hidden;
+  }
+  .wrap { text-align: center; padding: 40px 24px; max-width: 560px; }
+  h1 { font-size: clamp(32px, 6vw, 52px); font-weight: 700; letter-spacing: -0.04em; margin-bottom: 12px; }
+  .gradient-text {
+    background: linear-gradient(130deg, #828fff 0%, #5e6ad2 45%, #a78bfa 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  p { font-size: 16px; color: #484c5e; line-height: 1.7; margin-bottom: 40px; }
+  .links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .link {
+    font-size: 14px; font-weight: 500; color: #dde0ea;
+    background: #0d0e12; border: 1px solid #13151b;
+    border-radius: 10px; padding: 12px 28px; text-decoration: none;
+    transition: border-color 0.2s, transform 0.15s, background 0.2s;
+  }
+  .link:hover { border-color: #2a2d38; transform: translateY(-2px); }
+  .link.primary { background: #5e6ad2; border-color: #6b78e0; color: #fff; }
+  .link.primary:hover { background: #6b78e0; }
+  footer { position: fixed; bottom: 18px; font-size: 12px; color: #20222b; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>M Arjun Nabila<br><span class="gradient-text">Portfolio</span></h1>
+  <p>Two versions — same portfolio, different animation engines. Pick one.</p>
+  <div class="links">
+    <a href="gsap.html" class="link primary">GSAP Version →</a>
+    <a href="framer.html" class="link">Framer Motion Version →</a>
+  </div>
+</div>
+<footer>2025</footer>
+</body>
+</html>

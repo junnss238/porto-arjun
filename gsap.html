@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>M Arjun Nabila — AI Engineer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #05060a;
+    color: #dde0ea;
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── custom cursor ── */
+  .cursor-dot {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #5e6ad2; pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    position: fixed; top: 0; left: 0; z-index: 9998;
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid rgba(94,106,210,0.4);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  @media (hover: none) {
+    body { cursor: auto; }
+    .cursor-dot, .cursor-ring { display: none; }
+  }
+
+  /* ── grid bg ── */
+  .grid-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(#141620 1px, transparent 1px),
+      linear-gradient(90deg, #141620 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: radial-gradient(ellipse 70% 50% at 50% 50%, black 10%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 50% at 50% 50%, black 10%, transparent 100%);
+    opacity: 0.4;
+  }
+
+  /* ── glow ── */
+  .hero-glow {
+    position: absolute; top: 38%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 350px;
+    background: radial-gradient(ellipse, rgba(94,106,210,0.18) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── nav ── */
+  .nav {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    display: flex; align-items: center; gap: 28px;
+    background: rgba(8,9,12,0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid #13151b;
+    border-radius: 9999px; padding: 10px 24px;
+    opacity: 0;
+  }
+  .nav a { font-size: 13px; color: #484c5e; text-decoration: none; transition: color 0.15s; }
+  .nav a:hover { color: #dde0ea; }
+  .nav-logo { font-size: 14px; font-weight: 600; color: #dde0ea; letter-spacing: -0.01em; }
+
+  /* ── hero ── */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    padding: 0 24px; position: relative; overflow: hidden;
+  }
+  .hero-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 500; color: #7c87f5;
+    background: rgba(94,106,210,0.08);
+    border: 1px solid rgba(94,106,210,0.2);
+    border-radius: 9999px; padding: 5px 14px; margin-bottom: 36px;
+    opacity: 0;
+  }
+  .dot-live {
+    width: 6px; height: 6px; border-radius: 50%; background: #27a644;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(1.5); opacity: 0.5; }
+  }
+
+  h1 {
+    font-size: clamp(40px, 8vw, 78px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.03;
+    margin-bottom: 24px;
+    max-width: 760px;
+  }
+  h1 .line { display: block; overflow: hidden; }
+  h1 .line-inner { display: block; }
+  .gradient-text {
+    background: linear-gradient(130deg, #828fff 0%, #5e6ad2 45%, #a78bfa 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .sub {
+    font-size: 17px; color: #484c5e;
+    max-width: 460px; line-height: 1.72; margin-bottom: 40px;
+    opacity: 0;
+  }
+
+  .ctas { display: flex; gap: 10px; opacity: 0; }
+  .btn-primary {
+    font-size: 14px; font-weight: 500; color: #fff;
+    background: #5e6ad2; border: 1px solid #6b78e0;
+    border-radius: 10px; padding: 10px 22px; text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: #6b78e0; transform: translateY(-2px); }
+  .btn-ghost {
+    font-size: 14px; font-weight: 500; color: #7a7f94;
+    background: #0d0e12; border: 1px solid #13151b;
+    border-radius: 10px; padding: 10px 22px; text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, transform 0.15s;
+  }
+  .btn-ghost:hover { border-color: #2a2d38; color: #dde0ea; transform: translateY(-2px); }
+
+  /* scroll indicator */
+  .scroll-hint {
+    position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 1;
+    width: 20px; height: 32px; border: 1px solid #16181f;
+    border-radius: 10px; display: flex; justify-content: center; padding-top: 6px;
+    opacity: 0;
+  }
+  .scroll-dot {
+    width: 3px; height: 6px; background: #2a2d38; border-radius: 2px;
+    animation: scrollBounce 1.7s infinite ease-in-out;
+  }
+  @keyframes scrollBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+  /* ── marquee ── */
+  .marquee-wrap {
+    padding: 36px 0;
+    border-top: 1px solid #0d0e12;
+    border-bottom: 1px solid #0d0e12;
+    display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+  }
+  .marquee-track { display: flex; gap: 10px; width: max-content; }
+  .marquee-track.fwd  { animation: marquee-fwd 28s linear infinite; }
+  .marquee-track.rev  { animation: marquee-rev 28s linear infinite; }
+  @keyframes marquee-fwd { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  @keyframes marquee-rev { from{transform:translateX(-50%)} to{transform:translateX(0)} }
+  .tag {
+    font-size: 12px; font-weight: 500; color: #3a3d45;
+    padding: 5px 14px; border: 1px solid #16181f;
+    border-radius: 9999px; background: #0a0b0e;
+    white-space: nowrap;
+  }
+
+  /* ── sections ── */
+  .section { max-width: 980px; margin: 0 auto; padding: 96px 24px; }
+  .section-divider { border: none; border-top: 1px solid #0d0e12; }
+  .section-label {
+    font-size: 11px; font-weight: 600; color: #5e6ad2;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .section-title {
+    font-size: 30px; font-weight: 700;
+    letter-spacing: -0.025em; color: #dde0ea; margin-bottom: 52px;
+  }
+
+  /* ── cards ── */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px,1fr)); gap: 14px; }
+  .card {
+    position: relative; background: #08090c;
+    border: 1px solid #13151b; border-radius: 14px;
+    padding: 26px 26px 22px; overflow: hidden;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .card:hover { background: #0e0f14; border-color: #252833; }
+  .card-glow {
+    position: absolute; top: -80px; right: -80px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(94,106,210,0.1) 0%, transparent 70%);
+    pointer-events: none; opacity: 0; transition: opacity 0.3s;
+  }
+  .card:hover .card-glow { opacity: 1; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .card-name { font-size: 14px; font-weight: 600; color: #dde0ea; letter-spacing: -0.01em; }
+  .card-live { display: flex; align-items: center; gap: 5px; margin-left: 8px; flex-shrink: 0; }
+  .card-live-dot { width: 5px; height: 5px; border-radius: 50%; background: #27a644; animation: pulse 2s infinite; }
+  .card-live-text { font-size: 11px; color: #27a644; font-weight: 500; }
+  .card-desc { font-size: 13px; color: #484c5e; line-height: 1.65; margin-bottom: 16px; }
+  .card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .card-tag {
+    font-size: 11px; color: #32353f; background: #0d0e12;
+    border: 1px solid #16181f; border-radius: 5px; padding: 2px 8px;
+  }
+
+  /* ── skills ── */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 36px; }
+  .skill-cat { font-size: 11px; font-weight: 600; color: #5e6ad2; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+  .skill-item { font-size: 14px; color: #484c5e; margin-bottom: 10px; cursor: default; transition: color 0.15s; }
+  .skill-item:hover { color: #dde0ea; }
+
+  /* ── contact ── */
+  .contact-wrap { text-align: center; padding: 96px 24px 120px; }
+  .contact-title { font-size: clamp(28px,5vw,52px); font-weight: 700; letter-spacing: -0.03em; color: #dde0ea; margin-bottom: 14px; }
+  .contact-sub { font-size: 16px; color: #484c5e; max-width: 380px; margin: 0 auto 40px; line-height: 1.7; }
+  .contact-links { display: flex; gap: 10px; justify-content: center; }
+  .contact-link {
+    font-size: 14px; font-weight: 500; color: #dde0ea;
+    background: #0d0e12; border: 1px solid #13151b;
+    border-radius: 10px; padding: 11px 24px; text-decoration: none;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .contact-link:hover { border-color: #2a2d38; transform: translateY(-2px); }
+
+  /* ── footer ── */
+  footer { border-top: 1px solid #0d0e12; text-align: center; padding: 18px 24px; font-size: 12px; color: #20222b; }
+
+  /* ── magnetic hover ── */
+  .magnetic { transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); }
+
+  @media (max-width: 640px) {
+    .cards-grid { grid-template-columns: 1fr; }
+    .nav { gap: 16px; padding: 9px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <span class="nav-logo">Arjun</span>
+  <div style="display:flex;gap:18px;">
+    <a href="#projects">Projects</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="badge" id="heroBadge">
+      <span class="dot-live"></span>
+      Available for internship · 2025
+    </div>
+    <h1>
+      <span class="line"><span class="line-inner">Building AI systems</span></span>
+      <span class="line"><span class="line-inner gradient-text">that actually run</span></span>
+    </h1>
+    <p class="sub" id="heroSub">
+      Double Degree — TI UPNYK &amp; HES STAIQ. Fokus di AI agent architecture,
+      backend automation, dan sistem yang jalan sendiri 24/7 di production.
+    </p>
+    <div class="ctas" id="heroCtas">
+      <a href="#projects" class="btn-primary magnetic">Lihat projects ↓</a>
+      <a href="https://github.com/junnss238" target="_blank" class="btn-ghost magnetic">GitHub ↗</a>
+    </div>
+  </div>
+  <div class="scroll-hint" id="scrollHint"><div class="scroll-dot"></div></div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div style="overflow:hidden">
+    <div class="marquee-track fwd" id="m1"></div>
+  </div>
+  <div style="overflow:hidden">
+    <div class="marquee-track rev" id="m2"></div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<hr class="section-divider">
+<div class="section" id="projects">
+  <div class="gs-reveal">
+    <p class="section-label">Projects</p>
+    <p class="section-title">Sistem yang sudah live di production</p>
+  </div>
+  <div class="cards-grid" id="cards"></div>
+</div>
+
+<!-- SKILLS -->
+<hr class="section-divider">
+<div class="section" id="skills">
+  <div class="gs-reveal">
+    <p class="section-label">Skills</p>
+    <p class="section-title">Stack &amp; expertise</p>
+  </div>
+  <div class="skills-grid" id="skills-grid"></div>
+</div>
+
+<!-- CONTACT -->
+<hr class="section-divider">
+<div class="section" id="contact" style="padding:0">
+  <div class="contact-wrap gs-reveal">
+    <p class="section-label">Contact</p>
+    <h2 class="contact-title">Open to opportunities</h2>
+    <p class="contact-sub">Lagi cari magang / project kolaborasi — AI, data, atau backend automation.</p>
+    <div class="contact-links">
+      <a href="https://github.com/junnss238" target="_blank" class="contact-link magnetic">GitHub ↗</a>
+      <a href="https://t.me/juna_ai_bot" target="_blank" class="contact-link magnetic">Telegram ↗</a>
+    </div>
+  </div>
+</div>
+
+<footer>M Arjun Nabila · 2025</footer>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ── DATA ── */
+const STACK = ["Python","Next.js","TypeScript","Linux VPS","Telegram API","Moodle API","CalDAV","Framer Motion","shadcn/ui","FastAPI","Multi-Agent","Cron","REST API","Git","Obsidian"];
+
+const PROJECTS = [
+  { name:"Jaqen AI System", desc:"Multi-agent autonomous AI di production VPS. Morning brief, SPADA deadline watchdog, job radar, Apple CalDAV sync — 24/7 headless.", tags:["Python","Telegram API","Moodle API","CalDAV","Multi-Agent"] },
+  { name:"SPADA Deadline Watchdog", desc:"Moodle Web Services integration. Auto-skip submitted tasks. Alert H-2/H-1/H-0 dengan zero false positive.", tags:["Python","Moodle API","Cron"] },
+  { name:"Job Radar Engine", desc:"Scraper lowongan magang otomatis. Silent kalau kosong, digest ke Telegram kalau ada yang relevan.", tags:["Python","Scraping","NLP"] },
+  { name:"Unified Calendar Engine", desc:"Apple iCloud CalDAV dynamic discovery. Sync Google Calendar + iCal. Morning briefing contextual real-time.", tags:["Python","CalDAV","iCloud"] },
+];
+
+const SKILLS = [
+  { cat:"AI & Agent", items:["Multi-Agent Architecture","Prompt Engineering","Moodle API","Telegram Bot API"] },
+  { cat:"Backend", items:["Python","FastAPI","REST APIs","Cron / Linux"] },
+  { cat:"Frontend", items:["Next.js","TypeScript","Tailwind CSS","Framer Motion"] },
+  { cat:"Tools", items:["Git / GitHub","Obsidian","Hermes Agent","CalDAV / iCal"] },
+];
+
+/* ── Populate DOM ── */
+const doubled = [...STACK,...STACK,...STACK,...STACK];
+["m1","m2"].forEach(id => {
+  document.getElementById(id).innerHTML = doubled.map(s=>`<span class="tag">${s}</span>`).join('');
+});
+
+document.getElementById('cards').innerHTML = PROJECTS.map(p=>`
+  <div class="card gs-card magnetic">
+    <div class="card-glow"></div>
+    <div class="card-header">
+      <span class="card-name">${p.name}</span>
+      <div class="card-live">
+        <span class="card-live-dot"></span>
+        <span class="card-live-text">live</span>
+      </div>
+    </div>
+    <p class="card-desc">${p.desc}</p>
+    <div class="card-tags">${p.tags.map(t=>`<span class="card-tag">${t}</span>`).join('')}</div>
+  </div>
+`).join('');
+
+document.getElementById('skills-grid').innerHTML = SKILLS.map(s=>`
+  <div class="gs-skill">
+    <div class="skill-cat">${s.cat}</div>
+    ${s.items.map(i=>`<p class="skill-item">${i}</p>`).join('')}
+  </div>
+`).join('');
+
+/* ── GSAP Hero Timeline ── */
+const heroTL = gsap.timeline({ defaults: { ease: "power3.out" } });
+heroTL
+  .from("#mainNav", { y: -30, opacity: 0, duration: 0.6 })
+  .from("#heroBadge", { y: 20, opacity: 0, duration: 0.5 }, 0.1)
+  .from("h1 .line-inner", { y: "110%", duration: 0.8, stagger: 0.12 }, 0.2)
+  .from("#heroSub", { y: 24, opacity: 0, duration: 0.6 }, 0.6)
+  .from("#heroCtas", { y: 20, opacity: 0, duration: 0.5 }, 0.75)
+  .from("#scrollHint", { opacity: 0, duration: 0.4 }, 1.2);
+
+/* ── GSAP hero glow follow mouse ── */
+document.querySelector('.hero').addEventListener('mousemove', (e) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  gsap.to('.hero-glow', {
+    left: x, top: y, duration: 1.2, ease: "power2.out"
+  });
+});
+
+/* ── ScrollTrigger reveals ── */
+gsap.utils.toArray('.gs-reveal').forEach(el => {
+  gsap.from(el, {
+    y: 40, opacity: 0, duration: 0.7, ease: "power2.out",
+    scrollTrigger: { trigger: el, start: "top 85%", once: true }
+  });
+});
+
+/* ── ScrollTrigger cards stagger ── */
+ScrollTrigger.batch('.gs-card', {
+  start: "top 88%",
+  onEnter: batch => gsap.from(batch, {
+    y: 50, opacity: 0, duration: 0.6,
+    stagger: 0.12, ease: "power2.out"
+  }),
+  once: true
+});
+
+/* ── ScrollTrigger skills stagger ── */
+ScrollTrigger.batch('.gs-skill', {
+  start: "top 88%",
+  onEnter: batch => gsap.from(batch, {
+    y: 30, opacity: 0, duration: 0.5,
+    stagger: 0.08, ease: "power2.out"
+  }),
+  once: true
+});
+
+/* ── Custom cursor ── */
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  gsap.set(dot, { x: mouseX, y: mouseY });
+});
+
+gsap.ticker.add(() => {
+  ringX += (mouseX - ringX) * 0.15;
+  ringY += (mouseY - ringY) * 0.15;
+  gsap.set(ring, { x: ringX, y: ringY });
+});
+
+/* expand cursor on hover interactive */
+document.querySelectorAll('a, .card, button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    gsap.to(ring, { width: 52, height: 52, borderColor: 'rgba(94,106,210,0.6)', duration: 0.3 });
+    gsap.to(dot, { scale: 0.5, duration: 0.3 });
+  });
+  el.addEventListener('mouseleave', () => {
+    gsap.to(ring, { width: 36, height: 36, borderColor: 'rgba(94,106,210,0.4)', duration: 0.3 });
+    gsap.to(dot, { scale: 1, duration: 0.3 });
+  });
+});
+
+/* ── Magnetic hover ── */
+document.querySelectorAll('.magnetic').forEach(el => {
+  el.addEventListener('mousemove', e => {
+    const rect = el.getBoundingClientRect();
+    const dx = e.clientX - (rect.left + rect.width/2);
+    const dy = e.clientY - (rect.top + rect.height/2);
+    gsap.to(el, { x: dx * 0.25, y: dy * 0.25, duration: 0.3, ease: "power2.out" });
+  });
+  el.addEventListener('mouseleave', () => {
+    gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1,0.4)" });
+  });
+});
+
+/* ── Parallax hero glow on scroll ── */
+gsap.to('.hero-glow', {
+  y: -120, ease: "none",
+  scrollTrigger: { trigger: '.hero', start: "top top", end: "bottom top", scrub: true }
+});
+
+/* ── Nav show/hide on scroll ── */
+ScrollTrigger.create({
+  start: 20, end: 99999,
+  onUpdate: self => {
+    gsap.to('#mainNav', {
+      opacity: self.direction === -1 || self.scroll() < 100 ? 1 : 0.6,
+      duration: 0.3
+    });
+  }
+});
+</script>
+</body>
+</html>
