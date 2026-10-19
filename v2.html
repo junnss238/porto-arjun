@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="cyan">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M Arjun Nabila — AI Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<style>
+  :root{
+    --bg:#050608; --surface:#0d0f12; --surface2:#12151a;
+    --ink:#f2f4f6; --ink-mut:#9aa3ad; --ink-sub:#5c646d;
+    --hair:rgba(255,255,255,.08); --hair2:rgba(255,255,255,.14);
+    --accent:#00f5ff; --accent-dim:rgba(0,245,255,.14);
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  html[data-theme="violet"]{ --accent:#8b7cff; --accent-dim:rgba(139,124,255,.16); }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:auto}
+  html.lenis, html.lenis body{height:auto}
+  .lenis.lenis-smooth{scroll-behavior:auto!important}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Inter',sans-serif; font-size:16px; line-height:1.6;
+    overflow-x:hidden; cursor:none;
+  }
+  ::selection{background:var(--accent); color:#000}
+  a,button{cursor:none}
+  .mono{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-sub)}
+  .display{font-family:'Space Grotesk',sans-serif; font-weight:600; letter-spacing:-.035em; line-height:.95}
+
+  /* noise overlay */
+  body::after{
+    content:''; position:fixed; inset:0; z-index:200; pointer-events:none; opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ===== preloader ===== */
+  #loader{position:fixed; inset:0; z-index:300; background:var(--bg); display:flex; align-items:flex-end; justify-content:space-between; padding:5vw; transition:clip-path 1s var(--ease); clip-path:inset(0 0 0 0)}
+  #loader.done{clip-path:inset(0 0 100% 0)}
+  #loader .count{font-family:'Space Grotesk'; font-weight:700; font-size:clamp(80px,18vw,240px); letter-spacing:-.05em; line-height:.8; color:var(--ink)}
+  #loader .lname{color:var(--ink-sub)}
+  #loader .bar{position:absolute; left:0; bottom:0; height:2px; background:var(--accent); width:0%}
+
+  /* ===== cursor ===== */
+  #cursor{position:fixed; top:0; left:0; width:8px; height:8px; background:var(--accent); border-radius:50%; z-index:250; pointer-events:none; mix-blend-mode:difference}
+  #cursor-ring{position:fixed; top:0; left:0; width:36px; height:36px; border:1px solid var(--accent); border-radius:50%; z-index:250; pointer-events:none; transition:width .3s var(--ease), height .3s var(--ease), opacity .3s; opacity:.5}
+  #cursor-ring.hover{width:64px; height:64px; opacity:1}
+  @media (hover:none){ #cursor,#cursor-ring{display:none} body,a,button{cursor:auto} }
+  /* snap/audit mode: hero fixed height so full-page capture works */
+  html[data-snap] #hero{min-height:900px; height:900px}
+  html[data-snap] #hero-3d{height:700px}
+  html[data-snap] section{padding:100px 5vw}
+  html[data-snap] #contact{min-height:700px}
+  html[data-snap] .htrack{padding:80px 5vw}
+  html[data-snap] .sec-head{margin-bottom:48px}
+  html[data-snap] .proj{min-height:540px}
+
+  /* ===== nav ===== */
+  nav{position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:22px 5vw; mix-blend-mode:difference}
+  nav .logo{font-family:'Space Grotesk'; font-weight:700; font-size:15px; letter-spacing:-.02em; color:#fff; text-decoration:none}
+  nav .links{display:flex; gap:28px; align-items:center}
+  nav .links a{color:#fff; text-decoration:none; font-family:'JetBrains Mono'; font-size:11px; letter-spacing:.15em; text-transform:uppercase; opacity:.7; transition:opacity .3s}
+  nav .links a:hover{opacity:1}
+  #themeBtn{background:none; border:none; color:#fff; font-family:'JetBrains Mono'; font-size:10px; letter-spacing:.15em; padding:7px 4px; text-transform:uppercase; opacity:.7; transition:opacity .3s; display:flex; align-items:center; gap:8px}
+  #themeBtn::before{content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent)}
+  #themeBtn:hover{opacity:1}
+
+  /* ===== hero ===== */
+  #hero{position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end; padding:0 5vw 6vh; overflow:hidden}
+  .mesh{position:absolute; inset:-20%; z-index:0; filter:blur(90px); opacity:.75; pointer-events:none;
+    background:
+      radial-gradient(40% 46% at 66% 32%, var(--accent-dim), transparent 70%),
+      radial-gradient(26% 30% at 70% 40%, var(--accent-dim), transparent 70%),
+      radial-gradient(30% 35% at 30% 70%, var(--accent-dim), transparent 70%);
+    transition:background .8s;
+  }
+  #hero-3d{position:absolute; right:2vw; top:8vh; width:min(46vw,620px); height:78vh; z-index:1}
+  #hero-3d model-viewer{width:100%; height:100%; --poster-color:transparent; outline:none}
+  #hero-3d::after{content:''; position:absolute; left:50%; bottom:6%; width:60%; height:60px; transform:translateX(-50%); background:radial-gradient(50% 100% at 50% 50%, var(--accent-dim), transparent 75%); filter:blur(18px); pointer-events:none}
+  .hero-inner{position:relative; z-index:2}
+  .hero-tag{margin-bottom:22px; display:flex; gap:14px; align-items:center}
+  .hero-tag .dot{width:7px;height:7px;border-radius:50%;background:var(--accent); box-shadow:0 0 12px var(--accent)}
+  h1.hero-title{font-size:clamp(52px,10.5vw,160px); text-transform:uppercase; overflow:hidden; line-height:.88}
+  h1.hero-title .line{display:block; overflow:hidden}
+  h1.hero-title .ch{display:inline-block; transform:translateY(115%); will-change:transform}
+  .hero-sub{margin-top:30px; max-width:540px; color:var(--ink-mut); font-size:16.5px}
+  .hero-meta{margin-top:44px; padding-top:22px; border-top:1px solid var(--hair); display:flex; gap:40px; flex-wrap:wrap; max-width:640px}
+  .hero-meta .m{display:flex; flex-direction:column; gap:6px}
+  .hero-meta .m b{font-family:'Space Grotesk'; font-size:20px; font-weight:600; letter-spacing:-.02em}
+  .scroll-hint{position:absolute; bottom:6vh; right:5vw; z-index:2; writing-mode:vertical-rl; display:flex; align-items:center; gap:10px}
+  .scroll-hint .line{width:1px; height:56px; background:linear-gradient(var(--accent),transparent); animation:drip 2s var(--ease) infinite}
+  @keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* ===== marquee ===== */
+  .marquee{border-top:1px solid var(--hair); border-bottom:1px solid var(--hair); padding:18px 0; overflow:hidden; white-space:nowrap}
+  .marquee-track{display:inline-flex; gap:0; will-change:transform}
+  .marquee span{font-family:'Space Grotesk'; font-size:15px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-sub); padding:0 26px}
+  .marquee span i{color:var(--accent); font-style:normal; padding-right:26px}
+
+  /* ===== sections general ===== */
+  section{padding:14vh 5vw; position:relative}
+  .sec-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:8vh; gap:20px; flex-wrap:wrap}
+  .sec-head h2{font-size:clamp(38px,5.5vw,76px); text-transform:uppercase}
+  .sec-head h2 .ch{display:inline-block}
+  .sec-num{color:var(--accent)}
+
+  /* ===== about bento ===== */
+  .bento{display:grid; grid-template-columns:repeat(6,1fr); gap:14px}
+  .cell{background:var(--surface); border:1px solid var(--hair); border-radius:14px; padding:30px; position:relative; overflow:hidden; transition:border-color .4s, transform .4s var(--ease)}
+  .cell:hover{border-color:var(--hair2); transform:translateY(-4px)}
+  .cell::before{content:''; position:absolute; inset:0; background:radial-gradient(320px 200px at var(--mx,50%) var(--my,50%), var(--accent-dim), transparent 70%); opacity:0; transition:opacity .4s; pointer-events:none}
+  .cell:hover::before{opacity:1}
+  .cell h3{font-family:'Space Grotesk'; font-size:21px; font-weight:600; letter-spacing:-.02em; margin:14px 0 8px}
+  .cell p{color:var(--ink-mut); font-size:14px}
+  .c-big{grid-column:span 4} .c-sm{grid-column:span 2} .c-mid{grid-column:span 3}
+  .cell .icon{font-family:'JetBrains Mono'; font-size:11px; color:var(--accent); letter-spacing:.15em}
+  .cell .stat{font-family:'Space Grotesk'; font-size:clamp(40px,4.5vw,64px); font-weight:700; letter-spacing:-.04em; line-height:1}
+  .cell .stat em{font-style:normal; color:var(--accent)}
+  @media (max-width:860px){ .bento>*{grid-column:span 6!important} #hero-3d{position:relative; right:auto; top:auto; width:100%; height:46vh; order:-1} }
+
+  /* ===== projects horizontal ===== */
+  #work{padding:0}
+  .hwrap{overflow:hidden}
+  .htrack{display:flex; gap:4vw; padding:14vh 5vw; width:max-content; align-items:stretch}
+  .proj{width:min(560px,80vw); background:var(--surface); border:1px solid var(--hair); border-radius:16px; padding:38px; display:flex; flex-direction:column; justify-content:space-between; min-height:56vh; position:relative; overflow:hidden}
+  .proj::after{content:attr(data-i); position:absolute; right:24px; top:16px; font-family:'Space Grotesk'; font-weight:700; font-size:120px; letter-spacing:-.05em; color:transparent; -webkit-text-stroke:1px var(--hair2); line-height:1}
+  .proj h3{font-family:'Space Grotesk'; font-size:clamp(26px,2.6vw,38px); font-weight:600; letter-spacing:-.03em; margin:18px 0 12px}
+  .proj p{color:var(--ink-mut); font-size:14px; max-width:42ch}
+  .proj .tags{display:flex; gap:8px; flex-wrap:wrap; margin-top:22px}
+  .proj .tags span{font-family:'JetBrains Mono'; font-size:10px; letter-spacing:.12em; text-transform:uppercase; border:1px solid var(--hair2); border-radius:99px; padding:6px 12px; color:var(--ink-mut)}
+  .proj .go{margin-top:26px; display:inline-flex; align-items:center; gap:10px; color:var(--ink); text-decoration:none; font-family:'JetBrains Mono'; font-size:11px; letter-spacing:.15em; text-transform:uppercase}
+  .proj .go i{color:var(--accent); font-style:normal; transition:transform .3s var(--ease)}
+  .proj .go:hover i{transform:translateX(6px)}
+  .proj .thumb{height:180px; border-radius:10px; border:1px solid var(--hair); background:linear-gradient(135deg,var(--surface2),var(--bg)); position:relative; overflow:hidden}
+  .proj .thumb::before{content:''; position:absolute; inset:0; background:radial-gradient(60% 90% at 70% 20%, var(--accent-dim), transparent 70%)}
+
+  /* ===== stack list ===== */
+  .rows{border-top:1px solid var(--hair)}
+  .row{display:grid; grid-template-columns:70px 1fr auto; gap:20px; align-items:center; padding:26px 8px; border-bottom:1px solid var(--hair); transition:background .3s, padding-left .4s var(--ease)}
+  .row:hover{background:var(--surface); padding-left:22px}
+  .row .no{font-family:'JetBrains Mono'; font-size:11px; color:var(--ink-sub)}
+  .row .nm{font-family:'Space Grotesk'; font-size:clamp(20px,2.4vw,30px); font-weight:600; letter-spacing:-.025em; transition:color .3s}
+  .row:hover .nm{color:var(--accent)}
+  .row .lv{font-family:'JetBrains Mono'; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-mut)}
+
+  /* ===== contact ===== */
+  #contact{min-height:88vh; display:flex; flex-direction:column; justify-content:center; text-align:center; align-items:center; position:relative; overflow:hidden}
+  #contact .big{font-size:clamp(48px,9vw,140px); text-transform:uppercase}
+  #contact .big a{color:var(--ink); text-decoration:none; position:relative; display:inline-block}
+  #contact .big a::after{content:''; position:absolute; left:0; bottom:.02em; height:3px; width:100%; background:var(--accent); transform:scaleX(0); transform-origin:right; transition:transform .6s var(--ease)}
+  #contact .big a:hover::after{transform:scaleX(1); transform-origin:left}
+  footer{border-top:1px solid var(--hair); padding:26px 5vw; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="lname mono">M Arjun Nabila — Portfolio v2</div>
+  <div class="count">0</div>
+  <div class="bar"></div>
+</div>
+
+<div id="cursor"></div><div id="cursor-ring"></div>
+
+<nav>
+  <a class="logo" href="#hero">JUNS.</a>
+  <div class="links">
+    <a href="#about">About</a><a href="#work">Work</a><a href="#stack">Stack</a><a href="#contact">Contact</a>
+    <button id="themeBtn">theme · cyan</button>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="mesh"></div>
+  <div id="hero-3d">
+    <model-viewer src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/models/gltf/RobotExpressive/RobotExpressive.glb"
+      alt="Robot" autoplay animation-name="Dance" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="14deg"
+      camera-orbit="0deg 75deg 118%" shadow-intensity="1.2" shadow-softness="0.9"
+      exposure="1.3" interaction-prompt="none"></model-viewer>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="dot"></span><span class="mono">Open for projects</span></div>
+    <h1 class="hero-title" id="heroTitle">
+      <span class="line" data-text="M ARJUN"></span>
+      <span class="line" data-text="NABILA"></span>
+    </h1>
+    <p class="hero-sub">AI Engineer & Fullstack Developer. I build autonomous multi-agent systems, automation pipelines, and interfaces that feel alive. Double degree CS + HES, based in Indonesia.</p>
+    <div class="hero-meta">
+      <div class="m"><span class="mono">Focus</span><b>AI Systems</b></div>
+      <div class="m"><span class="mono">Stack</span><b>Python · JS · Go</b></div>
+      <div class="m"><span class="mono">Base</span><b>Kudus, ID</b></div>
+    </div>
+  </div>
+  <div class="scroll-hint"><span class="mono">scroll</span><span class="line"></span></div>
+</section>
+
+<div class="marquee"><div class="marquee-track" id="mq">
+  <span>AI Engineering<i>◆</i></span><span>Multi-Agent Systems<i>◆</i></span><span>Fullstack Development<i>◆</i></span><span>Automation<i>◆</i></span><span>LLM Orchestration<i>◆</i></span><span>UI Motion<i>◆</i></span>
+</div></div>
+
+<section id="about">
+  <div class="sec-head"><h2 data-split>About</h2><span class="mono sec-num">01 / profile</span></div>
+  <div class="bento">
+    <div class="cell c-big">
+      <span class="icon">// WHO</span>
+      <h3>Engineer yang hidup di terminal</h3>
+      <p>Menjalankan infrastruktur AI pribadi 24/7 — multi-agent swarm, routing LLM lintas provider dengan disiplin biaya, dan pipeline automation dari VPS Azure. Collector-executor: riset dulu, bangun cepat, ukur hasilnya.</p>
+    </div>
+    <div class="cell c-sm"><span class="icon">// AGENTS</span><div class="stat" data-count="6">0</div><p>bot & agent aktif dalam orkestrasi</p></div>
+    <div class="cell c-mid"><span class="icon">// TOKENS</span><div class="stat"><span data-count="23">0</span>M+</div><p>token diproses via router sendiri</p></div>
+    <div class="cell c-mid"><span class="icon">// UPTIME</span><div class="stat" data-count="24">0</div><p>jam operasi, failover otomatis</p></div>
+    <div class="cell c-mid">
+      <span class="icon">// NOW</span>
+      <h3>Double degree, double speed</h3>
+      <p>Teknik Informatika UPNYK (International) + HES STAIQ Depok, semester 5. Santri salafi, hafizh, eks-Menwa — disiplin itu default.</p>
+    </div>
+    <div class="cell c-mid">
+      <span class="icon">// MISSION</span>
+      <h3>Bikin AI yang beneran kerja</h3>
+      <p>Bukan demo, bukan mockup. Sistem yang jalan, terukur, dan hemat. Setiap rupiah token dihitung, setiap agent punya tugas.</p>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="hwrap" id="hwrap">
+    <div class="htrack" id="htrack">
+      <div class="proj" data-i="01">
+        <div><span class="mono" style="color:var(--accent)">featured — agent infra</span>
+        <h3>JUNS Omniscient</h3>
+        <p>Single-core AI aspri berbasis Hermes: routing 3 provider, guard biaya real-time, auto-failover, kompresi konteks. Melayani 24/7 dengan nol intervensi.</p>
+        <div class="tags"><span>Python</span><span>systemd</span><span>LLM Routing</span></div></div>
+        <div><div class="thumb"></div><a class="go" href="https://github.com/junnss238" target="_blank">lihat repo <i>→</i></a></div>
+      </div>
+      <div class="proj" data-i="02">
+        <div><span class="mono" style="color:var(--accent)">swarm</span>
+        <h3>Multi-Agent Swarm</h3>
+        <p>Orkestrasi agent otonom dengan blackboard SQLite, cadence scheduler, dan budget guard. Agent riset, eksekutor, dan verifier jalan paralel.</p>
+        <div class="tags"><span>Multi-agent</span><span>SQLite</span><span>Cron</span></div></div>
+        <div><div class="thumb"></div><a class="go" href="https://github.com/junnss238" target="_blank">lihat repo <i>→</i></a></div>
+      </div>
+      <div class="proj" data-i="03">
+        <div><span class="mono" style="color:var(--accent)">web</span>
+        <h3>Portfolio v2</h3>
+        <p>Yang lagi lo lihat ini. Single-file HTML: GSAP scroll choreography, Lenis inertia, 3D model-viewer, theme swap runtime. Nol build step, deploy via GitHub Pages.</p>
+        <div class="tags"><span>GSAP</span><span>Lenis</span><span>model-viewer</span></div></div>
+        <div><div class="thumb"></div><a class="go" href="https://github.com/junnss238/porto-arjun" target="_blank">lihat repo <i>→</i></a></div>
+      </div>
+      <div class="proj" data-i="04">
+        <div><span class="mono" style="color:var(--accent)">backup system</span>
+        <h3>Encrypted Offsite Pipeline</h3>
+        <p>Backup harian terenkripsi AES-256, di-chunk dan di-push otomatis ke repo private. Restore-tested, retensi berlapis lokal + offsite.</p>
+        <div class="tags"><span>Bash</span><span>openssl</span><span>Git</span></div></div>
+        <div><div class="thumb"></div><a class="go" href="https://github.com/junnss238" target="_blank">lihat repo <i>→</i></a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="sec-head"><h2 data-split>Stack</h2><span class="mono sec-num">03 / arsenal</span></div>
+  <div class="rows">
+    <div class="row"><span class="no">01</span><span class="nm">Python</span><span class="lv">agents · automation · data</span></div>
+    <div class="row"><span class="no">02</span><span class="nm">JavaScript / TypeScript</span><span class="lv">web · motion · tooling</span></div>
+    <div class="row"><span class="no">03</span><span class="nm">LLM Engineering</span><span class="lv">routing · prompting · eval</span></div>
+    <div class="row"><span class="no">04</span><span class="nm">Linux & DevOps</span><span class="lv">vps · systemd · security</span></div>
+    <div class="row"><span class="no">05</span><span class="nm">GSAP / Framer Motion</span><span class="lv">interaction · choreography</span></div>
+    <div class="row"><span class="no">06</span><span class="nm">Go</span><span class="lv">learning — services</span></div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="mesh"></div>
+  <span class="mono sec-num" style="margin-bottom:20px">04 / next</span>
+  <h2 class="display big" data-split>Punya ide?</h2>
+  <h2 class="display big"><a href="mailto:arjunjun238@gmail.com" data-split-link>Gas ngobrol →</a></h2>
+</section>
+
+<footer>
+  <span class="mono">© 2026 M Arjun Nabila</span>
+  <span class="mono">built with gsap · lenis · model-viewer</span>
+  <span class="mono" style="color:var(--accent)">junnss238.github.io</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const isTouch = matchMedia('(hover: none)').matches;
+const SNAP = new URLSearchParams(location.search).has('snap'); // audit/screenshot mode
+if (SNAP) document.documentElement.dataset.snap = '1';
+
+/* ---------- theme swap ---------- */
+const themeBtn = document.getElementById('themeBtn');
+themeBtn.addEventListener('click', () => {
+  const h = document.documentElement;
+  const v = h.dataset.theme === 'cyan';
+  h.dataset.theme = v ? 'violet' : 'cyan';
+  themeBtn.textContent = v ? 'theme · violet' : 'theme · cyan';
+});
+
+/* ---------- split hero text ---------- */
+document.querySelectorAll('#heroTitle .line').forEach(line => {
+  line.innerHTML = [...line.dataset.text].map(c =>
+    `<span class="ch">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+});
+
+/* ---------- lenis smooth scroll ---------- */
+let lenis = null;
+if (!isTouch && window.Lenis) {
+  lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1.0 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
+
+/* ---------- preloader ---------- */
+const count = document.querySelector('#loader .count');
+const bar = document.querySelector('#loader .bar');
+function revealSite() {
+  document.getElementById('loader').classList.add('done');
+  gsap.to('#heroTitle .ch', { y: 0, duration: SNAP ? 0 : 1.1, ease: 'expo.out', stagger: 0.035, delay: SNAP ? 0 : .35 });
+  gsap.from('.hero-sub, .hero-meta, .hero-tag', { y: 26, opacity: 0, duration: SNAP ? 0 : 1, ease: 'expo.out', stagger: .09, delay: SNAP ? 0 : .6 });
+}
+if (SNAP) {
+  document.getElementById('loader').style.display = 'none';
+  revealSite();
+} else {
+  let prog = { v: 0 };
+  gsap.to(prog, {
+    v: 100, duration: 1.6, ease: 'power2.inOut',
+    onUpdate: () => {
+      count.textContent = Math.round(prog.v);
+      bar.style.width = prog.v + '%';
+    },
+    onComplete: revealSite
+  });
+  /* failsafe: jangan pernah macet di loader */
+  setTimeout(() => { if (!document.getElementById('loader').classList.contains('done')) revealSite(); }, 5000);
+}
+
+/* ---------- cursor ---------- */
+if (!isTouch) {
+  const cur = document.getElementById('cursor'), ring = document.getElementById('cursor-ring');
+  const cx = gsap.quickTo(cur, 'x', { duration: .12, ease: 'power3' });
+  const cy = gsap.quickTo(cur, 'y', { duration: .12, ease: 'power3' });
+  const rx = gsap.quickTo(ring, 'x', { duration: .45, ease: 'power3' });
+  const ry = gsap.quickTo(ring, 'y', { duration: .45, ease: 'power3' });
+  addEventListener('mousemove', e => {
+    cx(e.clientX - 4); cy(e.clientY - 4); rx(e.clientX - 18); ry(e.clientY - 18);
+  });
+  document.querySelectorAll('a,button,.cell,.row').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+  });
+}
+
+/* ---------- bento spotlight ---------- */
+document.querySelectorAll('.cell').forEach(c => {
+  c.addEventListener('mousemove', e => {
+    const r = c.getBoundingClientRect();
+    c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  });
+});
+
+/* ---------- marquee ---------- */
+const mq = document.getElementById('mq');
+mq.innerHTML += mq.innerHTML + mq.innerHTML;
+gsap.to(mq, { xPercent: -33.333, duration: 22, ease: 'none', repeat: -1 });
+
+/* ---------- section titles split ---------- */
+document.querySelectorAll('[data-split]').forEach(h => {
+  const txt = h.textContent;
+  h.innerHTML = [...txt].map(c => `<span class="ch" style="display:inline-block">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+  if (!SNAP) gsap.from(h.querySelectorAll('.ch'), {
+    yPercent: 110, opacity: 0, duration: .9, ease: 'expo.out', stagger: .03,
+    scrollTrigger: { trigger: h, start: 'top 85%' }
+  });
+});
+
+/* ---------- bento stagger + counters ---------- */
+if (!SNAP) gsap.from('.cell', {
+  y: 60, opacity: 0, duration: 1, ease: 'expo.out', stagger: .08,
+  scrollTrigger: { trigger: '.bento', start: 'top 82%' }
+});
+document.querySelectorAll('[data-count]').forEach(el => {
+  const target = +el.dataset.count;
+  if (SNAP) { el.textContent = target; return; }
+  ScrollTrigger.create({
+    trigger: el, start: 'top 88%', once: true,
+    onEnter: () => gsap.fromTo(el, { textContent: 0 }, {
+      textContent: target, duration: 1.6, ease: 'power2.out', snap: { textContent: 1 }
+    })
+  });
+});
+
+/* ---------- horizontal work scroll ---------- */
+const track = document.getElementById('htrack');
+if (!isTouch && !SNAP) {
+  const getScroll = () => track.scrollWidth - innerWidth;
+  gsap.to(track, {
+    x: () => -getScroll(), ease: 'none',
+    scrollTrigger: {
+      trigger: '#work', start: 'top top', end: () => '+=' + getScroll(),
+      pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1
+    }
+  });
+} else {
+  document.getElementById('hwrap').style.overflowX = 'auto';
+}
+
+/* ---------- rows reveal ---------- */
+if (!SNAP) gsap.from('.row', {
+  x: -40, opacity: 0, duration: .8, ease: 'expo.out', stagger: .06,
+  scrollTrigger: { trigger: '.rows', start: 'top 85%' }
+});
+
+/* ---------- hero robot follows mouse subtly ---------- */
+if (!isTouch) {
+  const hero = document.getElementById('hero-3d');
+  const hx = gsap.quickTo(hero, 'x', { duration: 1.2, ease: 'power3' });
+  const hy = gsap.quickTo(hero, 'y', { duration: 1.2, ease: 'power3' });
+  addEventListener('mousemove', e => {
+    hx((e.clientX / innerWidth - .5) * -28);
+    hy((e.clientY / innerHeight - .5) * -18);
+  });
+}
+</script>
+</body>
+</html>
