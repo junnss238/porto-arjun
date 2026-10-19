@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="lilac">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M Arjun Nabila — AI Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+<style>
+  :root{
+    --bg:#f4f2ee; --surface:rgba(255,255,255,.65); --surface-solid:#ffffff;
+    --ink:#1c1b22; --ink-mut:#6b6879; --ink-sub:#a09dae;
+    --hair:rgba(28,27,34,.09); --hair2:rgba(28,27,34,.16);
+    --accent:#7c6cf0; --accent-dim:rgba(124,108,240,.14);
+    /* pastel liquid hues */
+    --h-lilac:#8b7cf6; --h-peach:#ffab7a; --h-mint:#4ecb9a; --h-rose:#f78fb3; --h-sky:#6db6f2;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  html[data-theme="peach"]{ --accent:#f08a4b; --accent-dim:rgba(240,138,75,.15); }
+  html[data-theme="mint"]{ --accent:#2ba880; --accent-dim:rgba(43,168,128,.14); }
+  html[data-theme="rose"]{ --accent:#e56d9a; --accent-dim:rgba(229,109,154,.14); }
+  html[data-theme="sky"]{ --accent:#4a94dd; --accent-dim:rgba(74,148,221,.14); }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:auto}
+  html.lenis, html.lenis body{height:auto}
+  .lenis.lenis-smooth{scroll-behavior:auto!important}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Inter',sans-serif; font-size:16px; line-height:1.65;
+    overflow-x:hidden; cursor:none;
+    -webkit-font-smoothing:antialiased;
+    -webkit-text-size-adjust:100%;
+  }
+  p{overflow-wrap:break-word}
+  ::selection{background:var(--accent); color:#fff}
+  a,button{cursor:none}
+  .mono{font-family:'Inter',sans-serif; font-weight:500; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-sub)}
+  .serif{font-family:'Instrument Serif',serif; font-style:italic; font-weight:400; text-transform:none; letter-spacing:0}
+  .display{font-family:'Space Grotesk',sans-serif; font-weight:600; letter-spacing:-.035em; line-height:.95}
+
+  /* liquid ambient blobs */
+  .blobs{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+  .blob{position:absolute; border-radius:50%; filter:blur(80px); opacity:.55; will-change:transform}
+  .b1{width:52vw;height:52vw; background:radial-gradient(circle at 35% 35%, #d9ceff, transparent 65%); top:-12%; left:-8%}
+  .b2{width:44vw;height:44vw; background:radial-gradient(circle at 60% 40%, #ffd9c2, transparent 65%); top:22%; right:-14%}
+  .b3{width:46vw;height:46vw; background:radial-gradient(circle at 45% 55%, #c2eedd, transparent 65%); bottom:-16%; left:14%}
+  .b4{width:30vw;height:30vw; background:radial-gradient(circle at 50% 50%, #ffd0e2, transparent 65%); top:48%; left:52%; opacity:.45}
+
+  /* noise overlay */
+  body::after{
+    content:''; position:fixed; inset:0; z-index:200; pointer-events:none; opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ===== preloader ===== */
+  #loader{position:fixed; inset:0; z-index:300; background:var(--bg); display:flex; align-items:flex-end; justify-content:space-between; padding:5vw; transition:clip-path 1s var(--ease); clip-path:inset(0 0 0 0)}
+  #loader.done{clip-path:inset(0 0 100% 0)}
+  #loader .count{font-family:'Space Grotesk'; font-weight:700; font-size:clamp(80px,18vw,240px); letter-spacing:-.05em; line-height:.8; color:var(--ink)}
+  #loader .lname{color:var(--ink-sub)}
+  #loader .bar{position:absolute; left:0; bottom:0; height:3px; background:linear-gradient(90deg,var(--h-lilac),var(--h-peach),var(--h-mint)); width:0%}
+
+  /* ===== cursor ===== */
+  #cursor{position:fixed; top:0; left:0; width:8px; height:8px; background:var(--accent); border-radius:50%; z-index:250; pointer-events:none}
+  #cursor-ring{position:fixed; top:0; left:0; width:36px; height:36px; border:1.5px solid var(--accent); border-radius:50%; z-index:250; pointer-events:none; transition:width .3s var(--ease), height .3s var(--ease), opacity .3s; opacity:.45}
+  #cursor-ring.hover{width:60px; height:60px; opacity:.9}
+  @media (hover:none){ #cursor,#cursor-ring{display:none} body,a,button{cursor:auto} }
+  /* snap/audit mode */
+  html[data-snap] #hero{min-height:900px; height:900px}
+  html[data-snap] .inner{transform:none!important; opacity:1!important}
+  html[data-snap] .hero-sub, html[data-snap] .hero-meta, html[data-snap] .hero-tag{opacity:1!important; transform:none!important}
+  html[data-snap] section{padding:100px 5vw}
+  html[data-snap] #contact{min-height:700px}
+  html[data-snap] .htrack{padding:80px 5vw}
+  html[data-snap] .sec-head{margin-bottom:48px}
+  html[data-snap] .proj{min-height:540px}
+
+  /* ===== nav ===== */
+  nav{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:100;
+    display:flex; justify-content:space-between; align-items:center; gap:26px;
+    padding:10px 22px; width:min(92vw,560px);
+    background:rgba(255,255,255,.55); backdrop-filter:blur(20px) saturate(1.6); -webkit-backdrop-filter:blur(20px) saturate(1.6);
+    border:1px solid rgba(255,255,255,.7); border-radius:99px;
+    box-shadow:0 8px 32px rgba(28,27,34,.08);
+  }
+  nav .logo{font-family:'Space Grotesk'; font-weight:700; font-size:15px; letter-spacing:-.02em; color:var(--ink); text-decoration:none}
+  nav .links{display:flex; gap:22px; align-items:center}
+  nav .links a{color:var(--ink); text-decoration:none; font-weight:500; font-size:11px; letter-spacing:.12em; text-transform:uppercase; opacity:.7; transition:opacity .3s}
+  nav .links a:hover{opacity:1}
+  #themeBtn{background:var(--ink); border:none; color:#fff; font-weight:500; font-size:10px; letter-spacing:.12em; padding:8px 14px; border-radius:99px; text-transform:uppercase; transition:opacity .3s; display:flex; align-items:center; gap:8px}
+  #themeBtn::before{content:''; width:7px; height:7px; border-radius:50%; background:var(--accent)}
+  #themeBtn:hover{opacity:.85}
+
+  /* ===== hero ===== */
+  #hero{position:relative; min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end; padding:0 5vw 7vh; overflow:hidden}
+  .orb{position:absolute; right:4vw; top:12vh; width:min(38vw,480px); aspect-ratio:1; z-index:1; will-change:transform}
+  .orb-core{position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #ffffff, var(--accent) 52%, #4c3fd6 105%);
+    box-shadow:0 40px 90px var(--accent-dim), inset -18px -30px 60px rgba(76,63,214,.35), inset 14px 20px 50px rgba(255,255,255,.75);
+    animation:orbFloat 9s ease-in-out infinite}
+  .orb-halo{position:absolute; inset:-16%; border-radius:50%;
+    background:conic-gradient(from 120deg, var(--h-lilac), var(--h-peach), var(--h-mint), var(--h-rose), var(--h-lilac));
+    filter:blur(46px); opacity:.5; animation:orbSpin 26s linear infinite}
+  .orb-ring{position:absolute; inset:-9%; border-radius:50%; border:1.5px solid rgba(255,255,255,.85);
+    box-shadow:0 0 0 1px var(--hair); animation:orbPulse 5s ease-in-out infinite}
+  @keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-22px) scale(1.03)}}
+  @keyframes orbSpin{to{transform:rotate(360deg)}}
+  @keyframes orbPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.05);opacity:.5}}
+  .hero-inner{position:relative; z-index:2}
+  .hero-tag{margin-bottom:22px; display:inline-flex; gap:12px; align-items:center; padding:9px 18px; border-radius:99px;
+    background:rgba(255,255,255,.6); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.75); box-shadow:0 4px 18px rgba(28,27,34,.06)}
+  .hero-tag .dot{width:7px;height:7px;border-radius:50%;background:var(--h-mint); box-shadow:0 0 10px var(--h-mint)}
+  h1.hero-title{font-size:clamp(52px,11vw,168px); text-transform:uppercase; overflow:hidden; line-height:.88}
+  h1.hero-title .line{display:block; overflow:hidden}
+  h1.hero-title .inner{display:inline-block; transform:translateY(115%); will-change:transform}
+  h1.hero-title .line:nth-child(2) .inner{background:linear-gradient(100deg,var(--h-lilac),var(--h-rose) 55%,var(--h-peach)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .hero-sub{margin-top:28px; max-width:min(520px,100%); color:var(--ink-mut); font-size:16.5px}
+  .hero-meta{margin-top:38px; display:grid; grid-template-columns:repeat(3,max-content); gap:14px}
+  .hero-meta .m{display:flex; flex-direction:column; gap:4px; padding:16px 22px; border-radius:20px;
+    background:rgba(255,255,255,.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.7); box-shadow:0 6px 22px rgba(28,27,34,.05)}
+  .hero-meta .m b{font-family:'Space Grotesk'; font-size:18px; font-weight:600; letter-spacing:-.02em}
+  .scroll-hint{position:absolute; bottom:7vh; right:5vw; z-index:2; writing-mode:vertical-rl; display:flex; align-items:center; gap:10px}
+  .scroll-hint .line{width:1.5px; height:56px; background:linear-gradient(var(--accent),transparent); animation:drip 2s var(--ease) infinite}
+  @keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* ===== marquee ===== */
+  .marquee{padding:18px 0; overflow:hidden; white-space:nowrap; position:relative; z-index:2}
+  .marquee-track{display:inline-flex; gap:0; will-change:transform}
+  .marquee span{font-family:'Instrument Serif',serif; font-style:italic; font-size:19px; color:var(--ink-mut); padding:0 26px}
+  .marquee span i{color:var(--accent); font-style:normal; padding-right:26px; font-size:12px}
+  .marquee span:nth-child(3n+2) i{color:var(--h-peach)}
+  .marquee span:nth-child(3n) i{color:var(--h-mint)}
+
+  /* ===== sections general ===== */
+  section{padding:14vh 5vw; position:relative; z-index:2}
+  .sec-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:8vh; gap:20px; flex-wrap:wrap}
+  .sec-head h2{font-size:clamp(40px,5.5vw,80px)}
+  .sec-head h2 .ch{display:inline-block}
+  .sec-head h2 em{font-family:'Instrument Serif',serif; font-style:italic; font-weight:400; text-transform:none; color:var(--accent)}
+  .sec-num{color:var(--accent)}
+
+  /* ===== about bento (liquid glass) ===== */
+  .bento{display:grid; grid-template-columns:repeat(6,1fr); gap:16px}
+  .cell{background:var(--surface); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.75); border-radius:24px; padding:32px; position:relative; overflow:hidden;
+    box-shadow:0 10px 34px rgba(28,27,34,.06);
+    transition:transform .5s var(--ease), box-shadow .5s var(--ease)}
+  .cell:hover{transform:translateY(-5px); box-shadow:0 20px 48px rgba(28,27,34,.10)}
+  .cell::before{content:''; position:absolute; inset:0; background:radial-gradient(320px 200px at var(--mx,50%) var(--my,50%), var(--accent-dim), transparent 70%); opacity:0; transition:opacity .4s; pointer-events:none}
+  .cell:hover::before{opacity:1}
+  .cell h3{font-family:'Space Grotesk'; font-size:21px; font-weight:600; letter-spacing:-.02em; margin:14px 0 8px}
+  .cell p{color:var(--ink-mut); font-size:14.5px}
+  .c-big{grid-column:span 4} .c-sm{grid-column:span 2} .c-mid{grid-column:span 3}
+  .cell .icon{font-weight:500; font-size:11px; color:var(--accent); letter-spacing:.18em; text-transform:uppercase}
+  .cell[data-hue="peach"] .icon{color:var(--h-peach)}
+  .cell[data-hue="mint"] .icon{color:var(--h-mint)}
+  .cell[data-hue="rose"] .icon{color:var(--h-rose)}
+  .cell[data-hue="sky"] .icon{color:var(--h-sky)}
+  .cell .stat{font-family:'Space Grotesk'; font-size:clamp(40px,4.5vw,64px); font-weight:700; letter-spacing:-.04em; line-height:1}
+  .cell .stat em{font-style:normal; color:var(--accent)}
+
+  /* ===== projects horizontal ===== */
+  #work{padding:0}
+  .hwrap{overflow:hidden}
+  .htrack{display:flex; gap:3vw; padding:14vh 5vw; width:max-content; align-items:stretch}
+  .proj{width:min(560px,82vw); background:var(--surface); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.75); border-radius:28px; padding:38px;
+    box-shadow:0 14px 44px rgba(28,27,34,.07);
+    display:flex; flex-direction:column; justify-content:space-between; min-height:56vh; position:relative; overflow:hidden;
+    transition:transform .5s var(--ease), box-shadow .5s var(--ease)}
+  .proj:hover{transform:translateY(-6px); box-shadow:0 26px 60px rgba(28,27,34,.12)}
+  .proj::after{content:attr(data-i); position:absolute; right:26px; top:18px; font-family:'Instrument Serif'; font-style:italic; font-weight:400; font-size:110px; color:var(--hair2); line-height:1}
+  .proj h3{font-family:'Space Grotesk'; font-size:clamp(26px,2.6vw,38px); font-weight:600; letter-spacing:-.03em; margin:18px 0 12px}
+  .proj p{color:var(--ink-mut); font-size:14.5px; max-width:44ch}
+  .proj .tags{display:flex; gap:8px; flex-wrap:wrap; margin-top:22px}
+  .proj .tags span{font-weight:500; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; border:1px solid var(--hair2); background:rgba(255,255,255,.5); border-radius:99px; padding:7px 14px; color:var(--ink-mut)}
+  .proj .go{margin-top:26px; display:inline-flex; align-items:center; gap:10px; color:var(--ink); text-decoration:none; font-weight:500; font-size:11px; letter-spacing:.14em; text-transform:uppercase}
+  .proj .go i{color:var(--accent); font-style:normal; transition:transform .3s var(--ease)}
+  .proj .go:hover i{transform:translateX(6px)}
+  .proj .thumb{height:190px; border-radius:18px; border:1px solid rgba(255,255,255,.8); position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#efeafd,#fdf4ee)}
+  .proj[data-hue="peach"] .thumb{background:linear-gradient(135deg,#ffe9d9,#fff3ec)}
+  .proj[data-hue="peach"] .mono-k{color:var(--h-peach)!important}
+  .proj[data-hue="mint"] .thumb{background:linear-gradient(135deg,#d8f5e8,#effbf5)}
+  .proj[data-hue="mint"] .mono-k{color:var(--h-mint)!important}
+  .proj[data-hue="rose"] .thumb{background:linear-gradient(135deg,#fbdcea,#fdf0f5)}
+  .proj[data-hue="rose"] .mono-k{color:var(--h-rose)!important}
+  .proj .thumb::after{content:''; position:absolute; inset:0; background:radial-gradient(70% 90% at 70% 25%, rgba(255,255,255,.7), transparent 70%)}
+
+  /* ===== stack list ===== */
+  .rows{border-top:1px solid var(--hair)}
+  .row{display:grid; grid-template-columns:60px 1fr auto; gap:20px; align-items:center; padding:26px 14px; border-bottom:1px solid var(--hair); border-radius:18px; transition:background .35s, padding-left .4s var(--ease)}
+  .row:hover{background:rgba(255,255,255,.6); padding-left:28px}
+  .row .no{font-family:'Instrument Serif'; font-style:italic; font-size:16px; color:var(--ink-sub)}
+  .row .nm{font-family:'Space Grotesk'; font-size:clamp(20px,2.4vw,30px); font-weight:600; letter-spacing:-.025em; transition:color .3s}
+  .row:hover .nm{color:var(--accent)}
+  .row .lv{font-weight:500; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-mut)}
+
+  /* ===== contact ===== */
+  #contact{min-height:88vh; display:flex; flex-direction:column; justify-content:center; text-align:center; align-items:center; position:relative; overflow:hidden}
+  #contact .big{font-size:clamp(48px,9vw,140px)}
+  #contact .big a{color:var(--ink); text-decoration:none; position:relative; display:inline-block; background:linear-gradient(100deg,var(--h-lilac),var(--h-rose) 55%,var(--h-peach)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+  #contact .big a::after{content:''; position:absolute; left:0; bottom:.02em; height:3px; width:100%; background:linear-gradient(90deg,var(--h-lilac),var(--h-peach)); border-radius:99px; transform:scaleX(0); transform-origin:right; transition:transform .6s var(--ease)}
+  #contact .big a:hover::after{transform:scaleX(1); transform-origin:left}
+  footer{border-top:1px solid var(--hair); padding:28px 5vw; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; position:relative; z-index:2}
+
+  /* ===== mobile ===== */
+  @media (max-width:860px){
+    body{font-size:15.5px}
+    nav{width:94vw; padding:9px 14px; gap:8px}
+    nav .links{gap:14px}
+    nav .links a{font-size:10px; letter-spacing:.06em}
+    nav .links a[href="#stack"], nav .links a[href="#about"]{display:none} /* About+Stack hide, sisa Work & Contact biar lega */
+    #themeBtn{font-size:9px; padding:7px 11px}
+    .blob{filter:blur(60px)}
+    .b1{width:85vw;height:85vw}
+    .b2{width:70vw;height:70vw}
+    .b3{width:75vw;height:75vw}
+    #hero{padding:0 6vw 6vh; min-height:100svh}
+    .orb{position:relative; right:auto; top:auto; width:min(52vw,220px); margin:96px auto 4px}
+    .orb-halo{filter:blur(34px)}
+    .hero-inner{margin-top:0}
+    h1.hero-title{font-size:clamp(44px,13.5vw,80px); line-height:.92}
+    .hero-sub{font-size:15.5px; max-width:100%}
+    .hero-meta{grid-template-columns:1fr 1fr; gap:10px; width:100%}
+    .hero-meta .m{padding:13px 16px; border-radius:16px}
+    .hero-meta .m:last-child{grid-column:span 2}
+    .hero-meta .m b{font-size:16px}
+    .scroll-hint{display:none}
+    section{padding:11vh 6vw}
+    .sec-head{margin-bottom:6vh}
+    .bento>*{grid-column:span 6!important}
+    .cell{padding:26px; border-radius:20px}
+    .htrack{padding:11vh 6vw; gap:5vw}
+    .proj{padding:28px; min-height:0; border-radius:22px}
+    .proj::after{font-size:80px; right:20px; top:12px}
+    .proj .thumb{height:150px}
+    .row{grid-template-columns:40px 1fr; row-gap:4px}
+    .row .lv{grid-column:2; font-size:9.5px}
+    footer{justify-content:center; text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<div class="blobs"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+
+<div id="loader">
+  <div class="lname mono">M Arjun Nabila — Portfolio</div>
+  <div class="count">0</div>
+  <div class="bar"></div>
+</div>
+
+<div id="cursor"></div><div id="cursor-ring"></div>
+
+<nav>
+  <a class="logo" href="#hero">JUNS.</a>
+  <div class="links">
+    <a href="#about">About</a><a href="#work">Work</a><a href="#stack">Stack</a><a href="#contact">Contact</a>
+    <button id="themeBtn">lilac</button>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="orb"><div class="orb-halo"></div><div class="orb-core"></div><div class="orb-ring"></div></div>
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="dot"></span><span class="mono">Open for projects</span><span class="serif" style="color:var(--accent); font-size:15px">— let's build</span></div>
+    <h1 class="hero-title" id="heroTitle">
+      <span class="line" data-text="M ARJUN"></span>
+      <span class="line" data-text="NABILA"></span>
+    </h1>
+    <p class="hero-sub">AI Engineer & Fullstack Developer. I build autonomous multi-agent systems, automation pipelines, and interfaces that feel alive. Double degree CS + HES, based in Indonesia.</p>
+    <div class="hero-meta">
+      <div class="m"><span class="mono">Focus</span><b>AI Systems</b></div>
+      <div class="m"><span class="mono">Stack</span><b>Python · JS · Go</b></div>
+      <div class="m"><span class="mono">Base</span><b>Kudus, ID</b></div>
+    </div>
+  </div>
+  <div class="scroll-hint"><span class="mono">scroll</span><span class="line"></span></div>
+</section>
+
+<div class="marquee"><div class="marquee-track" id="mq">
+  <span>AI Engineering<i>✳</i></span><span>Multi-Agent Systems<i>✳</i></span><span>Fullstack Development<i>✳</i></span><span>Automation<i>✳</i></span><span>LLM Orchestration<i>✳</i></span><span>UI Motion<i>✳</i></span>
+</div></div>
+
+<section id="about">
+  <div class="sec-head"><h2 data-split>About</h2><span class="mono sec-num">01 / profile</span></div>
+  <div class="bento">
+    <div class="cell c-big">
+      <span class="icon">Who</span>
+      <h3>Living in the terminal</h3>
+      <p>Running personal AI infrastructure 24/7 — multi-agent swarm, cross-provider LLM routing with cost discipline, and automation pipelines on an Azure VPS. Collector-executor: research first, build fast, measure results.</p>
+    </div>
+    <div class="cell c-sm" data-hue="peach"><span class="icon">Agents</span><div class="stat" data-count="6">0</div><p>bots & agents in orchestration</p></div>
+    <div class="cell c-mid" data-hue="sky"><span class="icon">Tokens</span><div class="stat"><span data-count="23">0</span>M+</div><p>tokens routed through my own gateway</p></div>
+    <div class="cell c-mid" data-hue="mint"><span class="icon">Uptime</span><div class="stat">24/7</div><p>always-on, automatic failover</p></div>
+    <div class="cell c-mid">
+      <span class="icon">Now</span>
+      <h3>Double degree, double speed</h3>
+      <p>Computer Science at UPNYK (International program) + HES at STAIQ Depok, 5th semester. Raised on routines most people can't keep — it shows in how I ship.</p>
+    </div>
+    <div class="cell c-mid" data-hue="rose">
+      <span class="icon">Mission</span>
+      <h3>Make AI actually work</h3>
+      <p>Not demos, not mockups. Systems that run, measured, and lean. Every token rupiah is counted, every agent has a job.</p>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="hwrap" id="hwrap">
+    <div class="htrack" id="htrack">
+      <div class="proj" data-i="01">
+        <div><span class="mono mono-k">featured — agent infra</span>
+        <h3>JUNS Omniscient</h3>
+        <p>Single-core AI aspri berbasis Hermes: routing 3 provider, guard biaya real-time, auto-failover, kompresi konteks. Melayani 24/7 dengan nol intervensi.</p>
+        <div class="tags"><span>Python</span><span>systemd</span><span>LLM Routing</span></div></div>
+        <div><div class="thumb"></div><a class="go" href="https://github.com/junnss238" target="_blank">lihat repo <i>→</i></a></div>
+      </div>
+      <div class="proj" data-i="02" data-hue="peach">
+        <div><span class="mono mono-k">swarm</span>
+        <h3>Multi-Agent Swarm</h3>
+        <p>Orkestrasi agent otonom dengan blackboard SQLite, cadence scheduler, dan budget guard. Agent riset, eksekutor, dan verifier jalan paralel.</p>
+        <div class="tags"><span>Multi-agent</span><span>SQLite</span><span>Cron</span></div></div>
+        <div><div class="thumb"></div><a class="go" href="https://github.com/junnss238" target="_blank">lihat repo <i>→</i></a></div>
+      </div>
+      <div class="proj" data-i="03" data-hue="mint">
+        <div><span class="mono mono-k">web</span>
+        <h3>Portfolio v2</h3>
+        <p>Yang lagi lo lihat ini. Single-file HTML: GSAP scroll choreography, Lenis inertia, 3D model-viewer, theme swap runtime. Nol build step, deploy via GitHub Pages.</p>
+        <div class="tags"><span>GSAP</span><span>Lenis</span><span>model-viewer</span></div></div>
+        <div><div class="thumb"></div><a class="go" href="https://github.com/junnss238/porto-arjun" target="_blank">lihat repo <i>→</i></a></div>
+      </div>
+      <div class="proj" data-i="04" data-hue="rose">
+        <div><span class="mono mono-k">backup system</span>
+        <h3>Encrypted Offsite Pipeline</h3>
+        <p>Backup harian terenkripsi AES-256, di-chunk dan di-push otomatis ke repo private. Restore-tested, retensi berlapis lokal + offsite.</p>
+        <div class="tags"><span>Bash</span><span>openssl</span><span>Git</span></div></div>
+        <div><div class="thumb"></div><a class="go" href="https://github.com/junnss238" target="_blank">lihat repo <i>→</i></a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="sec-head"><h2 data-split>Stack</h2><span class="mono sec-num">03 / arsenal</span></div>
+  <div class="rows">
+    <div class="row"><span class="no">01</span><span class="nm">Python</span><span class="lv">agents · automation · data</span></div>
+    <div class="row"><span class="no">02</span><span class="nm">JavaScript / TypeScript</span><span class="lv">web · motion · tooling</span></div>
+    <div class="row"><span class="no">03</span><span class="nm">LLM Engineering</span><span class="lv">routing · prompting · eval</span></div>
+    <div class="row"><span class="no">04</span><span class="nm">Linux & DevOps</span><span class="lv">vps · systemd · security</span></div>
+    <div class="row"><span class="no">05</span><span class="nm">GSAP / Framer Motion</span><span class="lv">interaction · choreography</span></div>
+    <div class="row"><span class="no">06</span><span class="nm">Go</span><span class="lv">learning — services</span></div>
+  </div>
+</section>
+
+<section id="contact">
+  <span class="mono sec-num" style="margin-bottom:20px">04 / next</span>
+  <h2 class="display big" data-split>Punya ide?</h2>
+  <h2 class="display big"><a href="mailto:arjunjun238@gmail.com" data-split-link>Gas ngobrol →</a></h2>
+</section>
+
+<footer>
+  <span class="mono">© 2026 M Arjun Nabila</span>
+  <span class="mono">built with gsap · lenis · model-viewer</span>
+  <span class="mono mono-k" style="color:var(--accent)">junnss238.github.io</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const isTouch = matchMedia('(hover: none)').matches;
+const SNAP = new URLSearchParams(location.search).has('snap');
+if (SNAP) document.documentElement.dataset.snap = '1';
+
+/* ---------- theme swap (cycle 5 pastel) ---------- */
+const themeBtn = document.getElementById('themeBtn');
+const THEMES = ['lilac', 'peach', 'mint', 'rose', 'sky'];
+themeBtn.addEventListener('click', () => {
+  const h = document.documentElement;
+  const next = THEMES[(THEMES.indexOf(h.dataset.theme) + 1) % THEMES.length];
+  h.dataset.theme = next;
+  themeBtn.textContent = next;
+});
+
+/* ---------- split hero text (per-line, background-clip safe) ---------- */
+document.querySelectorAll('#heroTitle .line').forEach(line => {
+  line.innerHTML = `<span class="inner">${line.dataset.text.replace(/ /g, '&nbsp;')}</span>`;
+});
+
+/* ---------- lenis smooth scroll ---------- */
+let lenis = null;
+if (!isTouch && window.Lenis) {
+  lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1.0 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
+
+/* ---------- preloader ---------- */
+const count = document.querySelector('#loader .count');
+const bar = document.querySelector('#loader .bar');
+function revealSite() {
+  document.getElementById('loader').classList.add('done');
+  if (SNAP) return; // snap: CSS paksa final state, tanpa gsap (virtual-time friendly)
+  gsap.to('#heroTitle .inner', { y: 0, duration: 1.2, ease: 'expo.out', stagger: 0.14, delay: .35 });
+  gsap.from('.hero-sub, .hero-meta, .hero-tag', { y: 26, opacity: 0, duration: 1, ease: 'expo.out', stagger: .09, delay: .6 });
+}
+if (SNAP) {
+  document.getElementById('loader').style.display = 'none';
+  revealSite();
+} else {
+  let prog = { v: 0 };
+  gsap.to(prog, {
+    v: 100, duration: 1.6, ease: 'power2.inOut',
+    onUpdate: () => {
+      count.textContent = Math.round(prog.v);
+      bar.style.width = prog.v + '%';
+    },
+    onComplete: revealSite
+  });
+  setTimeout(() => { if (!document.getElementById('loader').classList.contains('done')) revealSite(); }, 5000);
+}
+
+/* ---------- cursor ---------- */
+if (!isTouch) {
+  const cur = document.getElementById('cursor'), ring = document.getElementById('cursor-ring');
+  const cx = gsap.quickTo(cur, 'x', { duration: .12, ease: 'power3' });
+  const cy = gsap.quickTo(cur, 'y', { duration: .12, ease: 'power3' });
+  const rx = gsap.quickTo(ring, 'x', { duration: .45, ease: 'power3' });
+  const ry = gsap.quickTo(ring, 'y', { duration: .45, ease: 'power3' });
+  addEventListener('mousemove', e => {
+    cx(e.clientX - 4); cy(e.clientY - 4); rx(e.clientX - 18); ry(e.clientY - 18);
+  });
+  document.querySelectorAll('a,button,.cell,.row').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+  });
+}
+
+/* ---------- bento spotlight ---------- */
+document.querySelectorAll('.cell').forEach(c => {
+  c.addEventListener('mousemove', e => {
+    const r = c.getBoundingClientRect();
+    c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  });
+});
+
+/* ---------- blob drift (liquid) ---------- */
+gsap.to('.b1', { x: '6vw', y: '4vh', duration: 14, ease: 'sine.inOut', repeat: -1, yoyo: true });
+gsap.to('.b2', { x: '-5vw', y: '6vh', duration: 17, ease: 'sine.inOut', repeat: -1, yoyo: true });
+gsap.to('.b3', { x: '5vw', y: '-5vh', duration: 15, ease: 'sine.inOut', repeat: -1, yoyo: true });
+gsap.to('.b4', { x: '-4vw', y: '-4vh', duration: 12, ease: 'sine.inOut', repeat: -1, yoyo: true });
+
+/* ---------- marquee ---------- */
+const mq = document.getElementById('mq');
+mq.innerHTML += mq.innerHTML + mq.innerHTML;
+gsap.to(mq, { xPercent: -33.333, duration: 24, ease: 'none', repeat: -1 });
+
+/* ---------- section titles split ---------- */
+document.querySelectorAll('[data-split]').forEach(h => {
+  const txt = h.textContent;
+  h.innerHTML = [...txt].map(c => `<span class="ch" style="display:inline-block">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+  if (!SNAP) gsap.from(h.querySelectorAll('.ch'), {
+    yPercent: 110, opacity: 0, duration: .9, ease: 'expo.out', stagger: .03,
+    scrollTrigger: { trigger: h, start: 'top 85%' }
+  });
+});
+
+/* ---------- bento stagger + counters ---------- */
+if (!SNAP) gsap.from('.cell', {
+  y: 60, opacity: 0, duration: 1, ease: 'expo.out', stagger: .08,
+  scrollTrigger: { trigger: '.bento', start: 'top 82%' }
+});
+document.querySelectorAll('[data-count]').forEach(el => {
+  const target = +el.dataset.count;
+  if (SNAP) { el.textContent = target; return; }
+  ScrollTrigger.create({
+    trigger: el, start: 'top 88%', once: true,
+    onEnter: () => gsap.fromTo(el, { textContent: 0 }, {
+      textContent: target, duration: 1.6, ease: 'power2.out', snap: { textContent: 1 }
+    })
+  });
+});
+
+/* ---------- horizontal work scroll (desktop only; mobile = native swipe) ---------- */
+const track = document.getElementById('htrack');
+if (!isTouch && !SNAP) {
+  const getScroll = () => track.scrollWidth - innerWidth;
+  gsap.to(track, {
+    x: () => -getScroll(), ease: 'none',
+    scrollTrigger: {
+      trigger: '#work', start: 'top top', end: () => '+=' + getScroll(),
+      pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1
+    }
+  });
+} else {
+  const hw = document.getElementById('hwrap');
+  hw.style.overflowX = 'auto';
+  hw.style.scrollSnapType = 'x mandatory';
+  document.querySelectorAll('.proj').forEach(p => p.style.scrollSnapAlign = 'center');
+}
+
+/* ---------- rows reveal ---------- */
+if (!SNAP) gsap.from('.row', {
+  x: -40, opacity: 0, duration: .8, ease: 'expo.out', stagger: .06,
+  scrollTrigger: { trigger: '.rows', start: 'top 85%' }
+});
+
+/* ---------- hero orb follows mouse subtly ---------- */
+if (!isTouch) {
+  const hero = document.querySelector('.orb');
+  const hx = gsap.quickTo(hero, 'x', { duration: 1.2, ease: 'power3' });
+  const hy = gsap.quickTo(hero, 'y', { duration: 1.2, ease: 'power3' });
+  addEventListener('mousemove', e => {
+    hx((e.clientX / innerWidth - .5) * -28);
+    hy((e.clientY / innerHeight - .5) * -18);
+  });
+}
+</script>
+</body>
+</html>
