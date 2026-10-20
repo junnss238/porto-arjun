@@ -22,6 +22,11 @@
     --accent:#745ff2;
     --accent-dim:rgba(116,95,242,.14);
     --accent-glow:rgba(116,95,242,.28);
+    --blob-c1:#d5c7ff; --blob-c1b:#b8a2ff;
+    --blob-c2:#ffd4b8; --blob-c2b:#ffab7d;
+    --blob-c3:#c0f4df; --blob-c3b:#83ecc3;
+    --blob-c4:#ffd0e3; --blob-c4b:#ffa5c9;
+    --blob-c5:#cce5ff; --blob-c5b:#9dd2ff;
     --h-lilac:#8877f8;
     --h-peach:#ff8f5e;
     --h-mint:#28bf8c;
@@ -32,10 +37,46 @@
     --card-shadow:0 14px 40px rgba(22,21,28,.05), 0 2px 10px rgba(22,21,28,.02);
     --card-shadow-hover:0 26px 60px rgba(22,21,28,.1), 0 6px 18px rgba(22,21,28,.04);
   }
-  html[data-theme="peach"]{ --accent:#fa7438; --accent-dim:rgba(250,116,56,.14); --accent-glow:rgba(250,116,56,.3); }
-  html[data-theme="mint"]{ --accent:#1ab37f; --accent-dim:rgba(26,179,127,.14); --accent-glow:rgba(26,179,127,.3); }
-  html[data-theme="rose"]{ --accent:#ea4b84; --accent-dim:rgba(234,75,132,.14); --accent-glow:rgba(234,75,132,.3); }
-  html[data-theme="sky"]{ --accent:#328ee6; --accent-dim:rgba(50,142,230,.14); --accent-glow:rgba(50,142,230,.3); }
+  html[data-theme="lilac"]{
+    --accent:#745ff2; --accent-dim:rgba(116,95,242,.14); --accent-glow:rgba(116,95,242,.28);
+    --blob-c1:#d5c7ff; --blob-c1b:#b8a2ff;
+    --blob-c2:#ffd4b8; --blob-c2b:#ffab7d;
+    --blob-c3:#c0f4df; --blob-c3b:#83ecc3;
+    --blob-c4:#ffd0e3; --blob-c4b:#ffa5c9;
+    --blob-c5:#cce5ff; --blob-c5b:#9dd2ff;
+  }
+  html[data-theme="peach"]{
+    --accent:#fa7438; --accent-dim:rgba(250,116,56,.14); --accent-glow:rgba(250,116,56,.3);
+    --blob-c1:#ffe0cc; --blob-c1b:#ffb594;
+    --blob-c2:#ffeacc; --blob-c2b:#ffcf8a;
+    --blob-c3:#ffe1d0; --blob-c3b:#ffab82;
+    --blob-c4:#ffccd4; --blob-c4b:#ffa6b3;
+    --blob-c5:#ffe8d6; --blob-c5b:#ffbe9e;
+  }
+  html[data-theme="mint"]{
+    --accent:#1ab37f; --accent-dim:rgba(26,179,127,.14); --accent-glow:rgba(26,179,127,.3);
+    --blob-c1:#bcf4de; --blob-c1b:#85e8c1;
+    --blob-c2:#d3f9e9; --blob-c2b:#a1f0cf;
+    --blob-c3:#cbf6e6; --blob-c3b:#7ce5ba;
+    --blob-c4:#dff8f1; --blob-c4b:#a8f0dd;
+    --blob-c5:#c0ece5; --blob-c5b:#87dcd2;
+  }
+  html[data-theme="rose"]{
+    --accent:#ea4b84; --accent-dim:rgba(234,75,132,.14); --accent-glow:rgba(234,75,132,.3);
+    --blob-c1:#ffd2e2; --blob-c1b:#ffaac7;
+    --blob-c2:#ffe2ec; --blob-c2b:#ffbfd7;
+    --blob-c3:#ffc4dc; --blob-c3b:#ff8cb7;
+    --blob-c4:#ffdbe8; --blob-c4b:#ffb0ce;
+    --blob-c5:#fed8df; --blob-c5b:#fbaec1;
+  }
+  html[data-theme="sky"]{
+    --accent:#328ee6; --accent-dim:rgba(50,142,230,.14); --accent-glow:rgba(50,142,230,.3);
+    --blob-c1:#cae7ff; --blob-c1b:#94ceff;
+    --blob-c2:#dcf0ff; --blob-c2b:#aadeff;
+    --blob-c3:#c4e2ff; --blob-c3b:#8bc5ff;
+    --blob-c4:#daf4ff; --blob-c4b:#a6e8ff;
+    --blob-c5:#d0e6ff; --blob-c5b:#98caff;
+  }
 
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:auto}
@@ -85,30 +126,31 @@
   .blob{
     position:absolute; filter:blur(85px); opacity:.62; will-change:transform, border-radius;
     animation:liquidMorph 22s ease-in-out infinite alternate;
+    transition:background .8s ease, opacity .5s ease;
   }
   .b1{
     width:56vw; height:56vw; top:-12%; left:-8%;
-    background:radial-gradient(circle at 35% 35%, #d5c7ff 0%, #b8a2ff 45%, transparent 70%);
+    background:radial-gradient(circle at 35% 35%, var(--blob-c1) 0%, var(--blob-c1b) 45%, transparent 70%);
     animation-duration:24s;
   }
   .b2{
     width:48vw; height:48vw; top:18%; right:-14%;
-    background:radial-gradient(circle at 60% 40%, #ffd4b8 0%, #ffab7d 48%, transparent 72%);
+    background:radial-gradient(circle at 60% 40%, var(--blob-c2) 0%, var(--blob-c2b) 48%, transparent 72%);
     animation-duration:28s; animation-delay:-5s;
   }
   .b3{
     width:50vw; height:50vw; bottom:-14%; left:10%;
-    background:radial-gradient(circle at 45% 55%, #c0f4df 0%, #83ecc3 48%, transparent 72%);
+    background:radial-gradient(circle at 45% 55%, var(--blob-c3) 0%, var(--blob-c3b) 48%, transparent 72%);
     animation-duration:26s; animation-delay:-10s;
   }
   .b4{
     width:36vw; height:36vw; top:50%; left:44%;
-    background:radial-gradient(circle at 50% 50%, #ffd0e3 0%, #ffa5c9 50%, transparent 72%);
+    background:radial-gradient(circle at 50% 50%, var(--blob-c4) 0%, var(--blob-c4b) 50%, transparent 72%);
     opacity:.48; animation-duration:20s; animation-delay:-7s;
   }
   .b5{
     width:38vw; height:38vw; top:75%; right:8%;
-    background:radial-gradient(circle at 40% 40%, #cce5ff 0%, #9dd2ff 50%, transparent 70%);
+    background:radial-gradient(circle at 40% 40%, var(--blob-c5) 0%, var(--blob-c5b) 50%, transparent 70%);
     opacity:.42; animation-duration:30s; animation-delay:-14s;
   }
 
@@ -175,10 +217,9 @@
     box-shadow:0 12px 36px rgba(22,21,28,.06), inset 0 1px 2px rgba(255,255,255,.9);
   }
   nav .logo{
-    font-family:'Plus Jakarta Sans'; font-weight:800; font-size:15px;
-    letter-spacing:-.02em; color:var(--ink); text-decoration:none; display:flex; align-items:center; gap:6px;
+    font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px;
+    letter-spacing:-.03em; color:var(--ink); text-decoration:none; display:inline-flex; align-items:baseline;
   }
-  nav .logo span{color:var(--accent)}
   nav .links{display:flex; gap:22px; align-items:center}
   nav .links a{
     color:var(--ink); text-decoration:none; font-weight:500; font-size:12px;
@@ -392,6 +433,24 @@
   #work .sec-head h2{
     font-size:clamp(32px,4vw,56px);
   }
+  .work-ctrls{
+    display:flex; align-items:center; gap:16px;
+  }
+  .work-dots{
+    display:inline-flex; align-items:center; gap:7px;
+    background:rgba(255,255,255,.82); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.95); border-radius:99px;
+    padding:6px 14px; box-shadow:0 4px 16px rgba(22,21,28,.04);
+  }
+  .work-dots .dot{
+    width:7px; height:7px; border-radius:99px; background:var(--hair2); border:none; padding:0;
+    transition:all .35s var(--liquid-ease); cursor:pointer;
+  }
+  .work-dots .dot:hover{background:var(--accent)}
+  .work-dots .dot.active{width:22px; background:var(--accent)}
+  .work-counter{
+    font-family:'Plus Jakarta Sans'; font-size:11px; font-weight:700; color:var(--ink-mut); letter-spacing:.06em; margin-left:6px;
+  }
   .work-hint{
     display:inline-flex; align-items:center; gap:8px; font-size:11.5px; font-weight:600;
     color:var(--ink-sub); text-transform:uppercase; letter-spacing:.1em;
@@ -436,6 +495,12 @@
     transform-origin:center center;
     will-change:transform, opacity;
   }
+  .proj::before{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(460px circle at var(--mx,50%) var(--my,50%), var(--accent-dim), transparent 70%);
+    opacity:0; transition:opacity .35s; pointer-events:none; z-index:1;
+  }
+  .proj:hover::before{opacity:1}
   .proj:hover{
     box-shadow:0 28px 64px -14px rgba(22,21,28,.14), 0 8px 24px rgba(22,21,28,.05), inset 0 1px 2px #fff;
     border-color:#ffffff;
@@ -551,14 +616,15 @@
     align-items:center; position:relative; overflow:hidden; padding:12vh 6vw;
   }
   #contact .contact-sub{font-size:18px; color:var(--ink-mut); margin-bottom:14px; font-weight:500}
-  #contact .big{font-size:clamp(46px,8.5vw,130px); line-height:1}
+  #contact .big{font-size:clamp(44px,8.5vw,130px); line-height:1.06}
   #contact .big a{
     color:var(--ink); text-decoration:none; position:relative; display:inline-block;
+    padding-bottom:12px; margin-top:4px;
     background:linear-gradient(105deg, var(--h-lilac), var(--h-rose) 52%, var(--h-peach));
     -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
   }
   #contact .big a::after{
-    content:''; position:absolute; left:0; bottom:.02em; height:3px; width:100%;
+    content:''; position:absolute; left:0; bottom:0px; height:3.5px; width:100%;
     background:linear-gradient(90deg,var(--h-lilac),var(--h-peach)); border-radius:99px;
     transform:scaleX(0); transform-origin:right; transition:transform .5s var(--ease);
   }
@@ -622,11 +688,17 @@
     #work{
       padding:8vh 0 4vh; height:auto; min-height:auto; display:block;
     }
-    #work .sec-head-wrap{margin-bottom:3vh}
+    #work .sec-head{flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:2vh}
+    .work-ctrls{gap:8px}
+    .work-hint{display:none}
+    .work-dots{padding:5px 12px}
+    #work .sec-head-wrap{margin-bottom:2vh}
     .htrack{
       padding:12px 6vw 30px; gap:18px; width:100%;
       overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+      scrollbar-width:none; -ms-overflow-style:none;
     }
+    .htrack::-webkit-scrollbar{display:none}
     .proj{
       width:86vw; min-width:86vw; height:auto; min-height:auto; padding:26px 22px; border-radius:24px;
       scroll-snap-align:center;
@@ -659,7 +731,7 @@
 <div id="cursor"></div><div id="cursor-ring"></div>
 
 <nav>
-  <a class="logo" href="#hero">JUNS<span>.</span></a>
+  <a class="logo" href="#hero">JUNS.</a>
   <div class="links">
     <a href="#about">About</a>
     <a href="#work">Work</a>
@@ -774,8 +846,14 @@
   <div class="sec-head-wrap">
     <div class="sec-head">
       <h2 data-split>Selected <em>Works</em></h2>
-      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px">
-        <span class="label-caps sec-num">02 / works</span>
+      <div class="work-ctrls">
+        <div class="work-dots" id="workDots">
+          <button class="dot active" data-idx="0" aria-label="Project 1"></button>
+          <button class="dot" data-idx="1" aria-label="Project 2"></button>
+          <button class="dot" data-idx="2" aria-label="Project 3"></button>
+          <button class="dot" data-idx="3" aria-label="Project 4"></button>
+          <span class="work-counter" id="workCounter">01 / 04</span>
+        </div>
         <div class="work-hint">
           <span>Swipe / Scroll</span>
           <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -988,7 +1066,7 @@
   <p class="contact-sub">Have a high-stakes project or ambitious system in mind?</p>
   <h2 class="display big" data-split>Let's build</h2>
   <h2 class="display big">
-    <a href="mailto:arjunjun238@gmail.com">something exceptional →</a>
+    <a href="mailto:arjunjun238@gmail.com">something exceptional&nbsp;→</a>
   </h2>
 
   <div class="contact-channels">
@@ -1042,6 +1120,23 @@ if (!isTouch && window.Lenis) {
   gsap.ticker.lagSmoothing(0);
 }
 
+/* ---------- Smooth Anchor Links ---------- */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href');
+    if (!id || id === '#') return;
+    const target = document.querySelector(id);
+    if (target) {
+      e.preventDefault();
+      if (lenis) {
+        lenis.scrollTo(target, { duration: 1.2, offset: 0 });
+      } else {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
+});
+
 /* ---------- Preloader & Reveal Choreography ---------- */
 const count = document.querySelector('#loader .count');
 const bar = document.querySelector('#loader .bar');
@@ -1091,8 +1186,8 @@ if (!isTouch) {
   });
 }
 
-/* ---------- Bento Card Spotlight Follower ---------- */
-document.querySelectorAll('.cell').forEach(c => {
+/* ---------- Card Spotlight Follower ---------- */
+document.querySelectorAll('.cell, .proj').forEach(c => {
   c.addEventListener('mousemove', e => {
     const r = c.getBoundingClientRect();
     c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
@@ -1137,21 +1232,68 @@ document.querySelectorAll('[data-count]').forEach(el => {
 });
 
 /* ==========================================================================
-   DYNAMIC LIQUID CARD TRANSFORMATION & HORIZONTAL PIN (Desktop / Laptop)
+   DYNAMIC LIQUID CARD TRANSFORMATION & HORIZONTAL PIN
    Transforms cards on scroll: Focus blooming, 3D perspective turn & opacity
    ========================================================================== */
 const track = document.getElementById('htrack');
 const projs = gsap.utils.toArray('.proj');
+
+function updateActiveDot(idx) {
+  const dots = document.querySelectorAll('#workDots .dot');
+  dots.forEach((d, i) => {
+    if (i === idx) d.classList.add('active');
+    else d.classList.remove('active');
+  });
+  const counter = document.getElementById('workCounter');
+  if (counter) counter.textContent = `0${idx + 1} / 04`;
+}
+
+// Dot click navigation
+document.querySelectorAll('#workDots .dot').forEach((dot, idx) => {
+  dot.addEventListener('click', () => {
+    if (isTouch || window.innerWidth <= 860) {
+      const card = projs[idx];
+      if (card) {
+        track.scrollTo({ left: card.offsetLeft - 24, behavior: 'smooth' });
+      }
+    } else {
+      const st = ScrollTrigger.getById('workPin');
+      if (st) {
+        const progress = idx / (projs.length - 1);
+        const targetScroll = st.start + progress * (st.end - st.start);
+        if (lenis) lenis.scrollTo(targetScroll, { duration: 1.0 });
+        else window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+      }
+    }
+  });
+});
+
+// Mobile scroll listener
+if (isTouch || window.innerWidth <= 860) {
+  track.addEventListener('scroll', () => {
+    const scrollLeft = track.scrollLeft;
+    const cardWidth = projs[0] ? (projs[0].offsetWidth + 18) : 340;
+    const activeIdx = Math.min(Math.max(Math.round(scrollLeft / cardWidth), 0), projs.length - 1);
+    updateActiveDot(activeIdx);
+  }, { passive: true });
+}
 
 if (!isTouch && !SNAP && window.innerWidth > 860) {
   const getScroll = () => track.scrollWidth - innerWidth;
 
   const updateCardTransforms = () => {
     const screenCenter = window.innerWidth / 2;
-    projs.forEach(card => {
+    let closestIdx = 0;
+    let minDist = Infinity;
+
+    projs.forEach((card, idx) => {
       const rect = card.getBoundingClientRect();
       const cardCenter = rect.left + rect.width / 2;
       const dist = Math.abs(screenCenter - cardCenter);
+      if (dist < minDist) {
+        minDist = dist;
+        closestIdx = idx;
+      }
       const maxDist = window.innerWidth * 0.65;
       const norm = Math.min(dist / maxDist, 1);
 
@@ -1170,12 +1312,14 @@ if (!isTouch && !SNAP && window.innerWidth > 860) {
         overwrite: 'auto'
       });
     });
+    updateActiveDot(closestIdx);
   };
 
   gsap.to(track, {
     x: () => -getScroll(),
     ease: 'none',
     scrollTrigger: {
+      id: 'workPin',
       trigger: '#work',
       start: 'top top',
       end: () => '+=' + getScroll(),
